@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<launch>
+<!-- $ rosrun nodelet nodelet manager __name:=akira_recog_obj_nodelet -->
+  <node pkg="nodelet" type="nodelet" name="akira_recog_obj_nodelet" args="manager" output="screen" />
+
+<!-- $ rosrun nodelet nodelet load akira_recog_obj/recogObjMainClass akira_recog_obj_nodelet __name:=main -->
+  <node pkg="nodelet" type="nodelet" name="main" args="load akira_recog_obj/recogObjMainClass akira_recog_obj_nodelet" output="screen" />
+</launch>

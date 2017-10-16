@@ -1,0 +1,16 @@
+<library path="lib/libakira_recog_obj" >
+  <class name="akira_recog_obj" type="akira_recog_obj::recogObjMainClass" base_class_type="nodelet::Nodelet" >
+    <description>
+      akira_recog_obj main node
+    </description>
+  </class>
+</library>
+
+<!-- path: メインのパッケージディレクトリからライブラリへの相対パス -->
+<!-- ライブラリ名は libakira_recog_obj.so -->
+
+<!-- class: ライブラリから提供されるクラスについて説明する -->
+<!-- name: クラスの検索名．src ファイルで明記される Package と class を指定する -->
+<!-- type: フルの意味のあるクラスの型 -->
+<!-- base_class_type: ベースクラスの型の，フルの意味のあるクラスの型 -->
+<!-- description: クラスの説明 -->
