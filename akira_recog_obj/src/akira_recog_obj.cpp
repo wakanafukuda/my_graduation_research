@@ -3,6 +3,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
 
+#include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/PointCloud.h>
 #include <pcl/PCLPointCloud2.h>
@@ -20,7 +21,6 @@
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl_ros/filters/filter.h>
-#include <pcl/features/normal_3d.h>//法線ベクトルのヘッダ
 
 #include "akira_recog_obj/akira_recog_obj.h"
 
@@ -40,6 +40,7 @@ namespace akira_recog_obj
   
   ros::Publisher pub_obj;
   ros::Publisher pub_table;
+  ros::Publisher pub_table_normal_vec;
   ros::Subscriber sub;
   
   void recogObjMainClass::onInit ()
@@ -47,6 +48,7 @@ namespace akira_recog_obj
     ros::NodeHandle& nh = getNodeHandle ();
     pub_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
     pub_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
+    pub_table_normal_vec = nh.advertise <geometry_msgs::PoseStamped> ( "out_table_vec" , 1 );
     sub = nh.subscribe ( "/camera/depth_registered/points", 10, &recogObjMainClass::callback, this );
   }
   
@@ -94,8 +96,9 @@ namespace akira_recog_obj
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr object_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr table_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
 
-    pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
-
+    geometry_msgs::PoseStamped table_normal_vec;
+    sensor_msgs::PointCloud2::Ptr out_obj ( new sensor_msgs::PointCloud2 );
+    sensor_msgs::PointCloud2::Ptr out_table ( new sensor_msgs::PointCloud2 );
     if ( inliers->indices.size () == 0 )
       {
 	std::cerr << "No inliers." << std::endl;
@@ -123,15 +126,19 @@ namespace akira_recog_obj
 	    table_cloud->points[ i ].g = 255;
 	    table_cloud->points[ i ].b = 0;
 	  }
+
+	table_normal_vec.header.frame_id = ros_coefficients->header.frame_id;
+	table_normal_vec.pose.position.x = ros_coefficients->values[ 0 ];
+	table_normal_vec.pose.position.y = ros_coefficients->values[ 1 ];
+	table_normal_vec.pose.position.z = ros_coefficients->values[ 2 ];
+	
+	pcl::toROSMsg ( *object_cloud, *out_obj );
+	pcl::toROSMsg ( *table_cloud, *out_table );
+
+	pub_table_normal_vec.publish ( table_normal_vec );
+	pub_obj.publish ( *out_obj );
+	pub_table.publish ( *out_table );
       }
-    
-    
-    sensor_msgs::PointCloud2::Ptr out_obj ( new sensor_msgs::PointCloud2 );
-    sensor_msgs::PointCloud2::Ptr out_table ( new sensor_msgs::PointCloud2 );
-    pcl::toROSMsg ( *object_cloud, *out_obj );
-    pcl::toROSMsg ( *table_cloud, *out_table );
-    pub_obj.publish ( *out_obj );
-    pub_table.publish ( *out_table );
     
   }
 }
