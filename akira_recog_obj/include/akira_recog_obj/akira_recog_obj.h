@@ -16,7 +16,6 @@ namespace akira_recog_obj
 
     ros::Publisher pub_obj;
     ros::Publisher pub_table;
-    ros::Publisher pub_table_normal_vec;
     ros::Subscriber sub;
 
     virtual void onInit ();

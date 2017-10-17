@@ -40,7 +40,6 @@ namespace akira_recog_obj
   
   ros::Publisher pub_obj;
   ros::Publisher pub_table;
-  ros::Publisher pub_table_normal_vec;
   ros::Subscriber sub;
   
   void recogObjMainClass::onInit ()
@@ -48,7 +47,6 @@ namespace akira_recog_obj
     ros::NodeHandle& nh = getNodeHandle ();
     pub_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
     pub_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
-    pub_table_normal_vec = nh.advertise <geometry_msgs::PoseStamped> ( "out_table_vec" , 1 );
     sub = nh.subscribe ( "/camera/depth_registered/points", 10, &recogObjMainClass::callback, this );
   }
   
@@ -95,7 +93,6 @@ namespace akira_recog_obj
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr object_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr table_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
 
-    geometry_msgs::PoseStamped table_normal_vec;
     sensor_msgs::PointCloud2::Ptr out_obj ( new sensor_msgs::PointCloud2 );
     sensor_msgs::PointCloud2::Ptr out_table ( new sensor_msgs::PointCloud2 );
 
@@ -127,15 +124,9 @@ namespace akira_recog_obj
 	    table_cloud->points[ i ].b = 0;
 	  }
 
-	table_normal_vec.header.frame_id = ros_coefficients->header.frame_id;
-	table_normal_vec.pose.position.x = ros_coefficients->values[ 0 ];
-	table_normal_vec.pose.position.y = ros_coefficients->values[ 1 ];
-	table_normal_vec.pose.position.z = ros_coefficients->values[ 2 ];
-	
 	pcl::toROSMsg ( *object_cloud, *out_obj );
 	pcl::toROSMsg ( *table_cloud, *out_table );
 
-	pub_table_normal_vec.publish ( table_normal_vec );
 	pub_obj.publish ( *out_obj );
 	pub_table.publish ( *out_table );
       }
