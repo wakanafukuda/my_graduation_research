@@ -68,19 +68,18 @@ namespace akira_recog_obj
     pcl::PCLPointCloud2::Ptr raw_cloud ( new pcl::PCLPointCloud2 );
     pcl::PCLPointCloud2ConstPtr raw_cloudPtr ( raw_cloud );
     pcl::PCLPointCloud2 raw_cloud_filtered;//消すとコアダンプ起きる
-    //    pcl_conversions::toPCL ( *input_cloud, *raw_cloud );
-    pcl_conversions::toPCL ( *noise_filtered_cloud, *raw_cloud );//ノイズ除去無の時の変換
+    //    pcl_conversions::toPCL ( *input_cloud, *raw_cloud );//ノイズ除去無の時の変換
+    pcl_conversions::toPCL ( *noise_filtered_cloud, *raw_cloud );
     pcl::VoxelGrid<pcl::PCLPointCloud2> vgf;
     vgf.setInputCloud ( raw_cloudPtr );
     vgf.setLeafSize ( 0.01, 0.01, 0.01 );//値を小さくすると細かくなる
     vgf.filter ( raw_cloud_filtered );
-    //
     
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr voxeled_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
     pcl::fromPCLPointCloud2 ( raw_cloud_filtered, *voxeled_cloud );
     pcl::ModelCoefficients::Ptr coefficients ( new pcl::ModelCoefficients );
     pcl::PointIndices::Ptr inliers ( new pcl::PointIndices );
-    
+
     pcl::SACSegmentation <pcl::PointXYZRGB> seg;
     seg.setOptimizeCoefficients ( true );
     seg.setModelType ( pcl::SACMODEL_PLANE );
@@ -99,6 +98,7 @@ namespace akira_recog_obj
     geometry_msgs::PoseStamped table_normal_vec;
     sensor_msgs::PointCloud2::Ptr out_obj ( new sensor_msgs::PointCloud2 );
     sensor_msgs::PointCloud2::Ptr out_table ( new sensor_msgs::PointCloud2 );
+
     if ( inliers->indices.size () == 0 )
       {
 	std::cerr << "No inliers." << std::endl;
