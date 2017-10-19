@@ -15,15 +15,17 @@ namespace akira_recog_obj
   public:
     detectTableClass();
     ~detectTableClass();
-    
+
+    pcl::ModelCoefficients::Ptr coefficients;
     pcl::PointIndices::Ptr inliers_index;
-    pcl::PointCloud2::Ptr inliers_data;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr inliers_data;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr outliers_data;
     
     int presentNumber;
     int thisIsTable;
 
 
-  }
+  };
 }
 
 #endif
