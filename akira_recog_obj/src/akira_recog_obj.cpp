@@ -25,8 +25,6 @@
 
 #include "akira_recog_obj/akira_recog_obj.h"
 
-#define THRESHOLD 0.1
-
 namespace akira_recog_obj
 {
   recogObjMainClass::recogObjMainClass ()
@@ -53,9 +51,9 @@ namespace akira_recog_obj
   
   void recogObjMainClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
   {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr noisy_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr noisy_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
     pcl::fromROSMsg ( *input_cloud, *noisy_cloud );
-    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+    pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
     sor.setInputCloud ( noisy_cloud );
     sor.setMeanK ( 50 );
     sor.setStddevMulThresh ( 1.0 );
@@ -81,10 +79,10 @@ namespace akira_recog_obj
 
     pcl::SACSegmentation <pcl::PointXYZRGB> seg;
     seg.setOptimizeCoefficients ( true );
-    seg.setModelType ( pcl::SACMODEL_PARPENDICULAR_PLANE );
+    seg.setModelType ( pcl::SACMODEL_PARALLEL_PLANE );
     seg.setMethodType ( pcl::SAC_RANSAC );
-    seg.setDistanceThreshold ( THRESHOLD );
-    seg.setAxis ( Eigen::Vector3f ( 0.0, 0.0, 1.0 ) );
+    seg.setDistanceThreshold ( 0.05 );
+    seg.setAxis ( Eigen::Vector3f ( 1.0, 1.0, 0.0 ) );
     seg.setInputCloud ( voxeled_cloud->makeShared () );
     seg.segment ( *inliers, *coefficients );
     
