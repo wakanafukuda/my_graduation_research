@@ -15,6 +15,7 @@
 #include <pcl/conversions.h>
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/sac_model_parallel_plane.h>
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/filters/voxel_grid.h>
 //#include <pcl/filters/approximate_voxel_grid.h>
@@ -80,9 +81,10 @@ namespace akira_recog_obj
 
     pcl::SACSegmentation <pcl::PointXYZRGB> seg;
     seg.setOptimizeCoefficients ( true );
-    seg.setModelType ( pcl::SACMODEL_PLANE );
+    seg.setModelType ( pcl::SACMODEL_PARPENDICULAR_PLANE );
     seg.setMethodType ( pcl::SAC_RANSAC );
     seg.setDistanceThreshold ( THRESHOLD );
+    seg.setAxis ( Eigen::Vector3f ( 0.0, 0.0, 1.0 ) );
     seg.setInputCloud ( voxeled_cloud->makeShared () );
     seg.segment ( *inliers, *coefficients );
     
