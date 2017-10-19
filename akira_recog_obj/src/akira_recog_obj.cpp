@@ -52,9 +52,9 @@ namespace akira_recog_obj
   
   void recogObjMainClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
   {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr noisy_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr noisy_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
     pcl::fromROSMsg ( *input_cloud, *noisy_cloud );
-    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+    pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
     sor.setInputCloud ( noisy_cloud );
     sor.setMeanK ( 50 );
     sor.setStddevMulThresh ( 1.0 );
