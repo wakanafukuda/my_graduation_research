@@ -3,9 +3,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
 
-#include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/PointCloud.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -18,7 +16,6 @@
 #include <pcl/sample_consensus/sac_model_perpendicular_plane.h>
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/filters/voxel_grid.h>
-//#include <pcl/filters/approximate_voxel_grid.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl_ros/filters/filter.h>
