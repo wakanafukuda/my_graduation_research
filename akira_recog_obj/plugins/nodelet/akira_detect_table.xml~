@@ -1,7 +1,7 @@
 <library path="lib/libakira_recog_obj" >
-  <class name="akira_recog_obj/recogObjMainClass" type="akira_recog_obj::recogObjMainClass" base_class_type="nodelet::Nodelet" >
+  <class name="akira_recog_obj/detectTableClass" type="akira_recog_obj::detectTableClass" base_class_type="nodelet::Nodelet" >
     <description>
-      akira_recog_obj main node
+      akira_recog_obj detect table node
     </description>
   </class>
 </library>
