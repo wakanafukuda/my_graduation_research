@@ -23,33 +23,33 @@
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl_ros/filters/filter.h>
 
-#include "akira_recog_obj/akira_recog_obj.h"
+#include "akira_recog_obj/akira_detect_table.h"
 
 namespace akira_recog_obj
 {
-  recogObjMainClass::recogObjMainClass ()
+  detectTableClass::detectTableClass ()
   {
-    ROS_INFO ( "akira_recog_obj nodelet start" );
+    ROS_INFO ( "akira_detect_table nodelet start" );
   }
   
-  recogObjMainClass::~recogObjMainClass ()
+  detectTableClass::~detectTableClass ()
   {
-    ROS_INFO ( "akira_recog_obj nodelet stop" );
+    ROS_INFO ( "akira_detect_table nodelet stop" );
   }
   
   ros::Publisher pub_obj;
   ros::Publisher pub_table;
   ros::Subscriber sub;
   
-  void recogObjMainClass::onInit ()
+  void detectTableClass::onInit ()
   {
     ros::NodeHandle& nh = getNodeHandle ();
     pub_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
     pub_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
-    sub = nh.subscribe ( "/camera/depth_registered/points", 10, &recogObjMainClass::callback, this );
+    sub = nh.subscribe ( "/camera/depth_registered/points", 10, &detectTableClass::callback, this );
   }
   
-  void recogObjMainClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
+  void detectTableClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
   {
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr noisy_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
     pcl::fromROSMsg ( *input_cloud, *noisy_cloud );
@@ -136,7 +136,7 @@ namespace akira_recog_obj
   }
 }
 
-PLUGINLIB_EXPORT_CLASS ( akira_recog_obj::recogObjMainClass, nodelet::Nodelet )
+PLUGINLIB_EXPORT_CLASS ( akira_recog_obj::detectTableClass, nodelet::Nodelet )
     
 //"nodelet/Tutorials/Porting nodes to nodelets"の差分
 //2015年以降は PLUGINLIB_DECLARE_CLASS の代わりに PLUGINLIB_EXPORT_CLASS が採用されている
