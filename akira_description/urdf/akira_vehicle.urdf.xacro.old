@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+
+<robot name="base" xmlns:xacro="http://ros.org/wiki/xacro">
+
+	<!-- Define a number of dimensions using properties -->
+	<property name="base_radius" value="0.25" />
+	<property name="base_length" value="0.3" />
+	<property name="wheel_radius" value="0.15" />
+	<property name="wheel_length" value="0.1" />
+	<property name="wheel_axis_length" value="0.25" />
+	<property name="wheel_offset_x" value="0" />
+	<property name="wheel_offset_y" value="0" />
+	<property name="wheel_offset_z" value="0" />
+	
+	<property name="PI" value="3.1415" />
+	<property name="SIN30" value="0.5" />
+	<property name="COS30" value="0.8660" />
+	
+	<!-- define a wheel -->
+	<!-- Link & joint -->
+	<macro name="wheel" params="suffix parent reflect color">
+	  <!-- joint -->
+	  <joint name="${parent}_${suffix}_wheel_joint" type="fixed">
+	    <!-- right: x=L*sin30 y=-L*cos30 -->
+	    <!-- left: x=L*sin30 y=L*cos30 -->
+	    <origin xyz="${wheel_axis_length*SIN30} ${-1.0*reflect*wheel_axis_length*COS30} ${wheel_offset_z}" rpy="${reflect*PI/2} 0 ${reflect*PI/6}" />
+	    <parent link="${parent}_link" />
+	    <child link="${parent}_${suffix}_wheel_link" />
+	  </joint>
+	  
+	  <!-- link -->
+	  <link name="${parent}_${suffix}_wheel_link">
+	    <!-- kokoha atode mesh ninarukamo -->
+	    <visual>
+	      <origin xyz="0 0 0" rpy="0 0 0" />
+	      <geometry>
+	        <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+	      </geometry>
+	      <material name="${color}" />
+	    </visual>
+	  </link>
+	</macro>
+	
+	<!--  -->
+	<!-- The base link -->
+	<macro name="base" params="name color">
+	  <!-- link -->
+	  <link name="${name}_link">
+	    <!-- kokoha atode mesh ninarukamo -->
+	    <visual>
+	      <origin xyz="0 0 0" rpy="0 0 0" />
+	      <geometry>
+	        <cylinder radius="${base_radius}" length="${base_length}" />
+	      </geometry>
+	      <material name="${color}" />
+	    </visual>
+	    <collision>
+	      <origin xyz="0 0 0" rpy="0 0 0" />
+	      <geometry>
+	        <!-- OK? -->
+	        <cylinder radius="${base_radius}" length="${base_length}" />
+	      </geometry>
+	    </collision>
+	  </link>
+	</macro>
+	
+	<!-- The role of the base_footprint is essentially to define 
+	     the elevation of the base above the ground. -->
+	<link name="base_footprint">
+	  <visual>
+	      <origin xyz="0 0 0" rpy="0 0 0" />
+	       <geometry>
+	          <box size="0.05 0.05 0.001" />
+	       </geometry>
+	       <material name="TransparentGreen" />
+	   </visual>
+	</link>
+	
+	<joint name="base_joint" type="fixed">
+	  <origin xyz="0 0 ${base_length/2 - wheel_offset_z}" rpy="0 0 0" />
+	  <parent link="base_footprint" />
+	  <child link="base_link" />
+	</joint>
+	
+	<!-- Add the drive wheels(right & left)-->
+	<wheel parent="base" suffix="right" reflect="1" color="Orange" />
+	<wheel parent="base" suffix="left" reflect="-1" color="Orange" />
+	
+	<!-- +back(Can we combine above process with the above "base" macro?) -->
+	<link name="base_back_wheel_link">
+	  <visual>
+	    <origin xyz="0 0 0" rpy="0 0 0" />
+	      <geometry>
+	        <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+	      </geometry>
+	      <material name="Orange" />
+	  </visual>
+	</link>
+	<joint name="base_back_wheel_joint" type="fixed">
+	  <origin xyz="${-1.0*wheel_axis_length} 0 ${wheel_offset_z}" rpy="0 ${-1.0*PI/2.0} 0" />
+	  <parent link="base_link" />
+	  <child link="base_back_wheel_link" />
+	</joint>
+	
+</robot>
+

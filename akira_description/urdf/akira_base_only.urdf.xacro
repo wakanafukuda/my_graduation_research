@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<robot name="base" xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:include filename="$(find akira_description)/urdf/materials.urdf.xacro" />
+	<!--xacro:include filename="$(find akira_description)/urdf/vehicle.urdf.xacro" /-->
+	<xacro:include filename="$(find akira_description)/urdf/vehicle_real.urdf.xacro" />
+	
+	<base name="base" color="Black" />
+</robot>
