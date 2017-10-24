@@ -15,14 +15,7 @@
    <property name="arm_offset_y" value="-0.20" />
    <property name="arm_offset_z" value="0.20" />
    -->
-   
-   <!-- face_offset_z= ${torso_size_z}/2 + ${face_size_z}/2 -->
-   <!--
-   <property name="face_offset_x" value="-0.03" />
-   <property name="face_offset_y" value="0.0" />
-   <property name="face_offset_z" value="0.532" />
-   -->
-   
+      
    <property name="camera_offset_x" value="0.1" />
    <property name="camera_offset_y" value="0.0" />
    <property name="camera_offset_z" value="0.695" />
@@ -69,13 +62,6 @@
    </gripper>
    -->
 
-   <!-- Attach the face -->
-   <!--
-   <face name="face" parent="torso" color="Danboru">
-     <origin xyz="${face_offset_x} ${face_offset_y} ${face_offset_z}" rpy="0 0 0" />
-   </face>
-   -->
-   
    <!-- Attach the camera -->
    <camera name="camera" parent="torso" color="Black">
     <origin xyz="${camera_offset_x} ${camera_offset_y} ${camera_offset_z}" rpy="0 0 0" />
