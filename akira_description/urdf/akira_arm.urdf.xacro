@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<robot name="arm" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find akira_description)/urdf/arm_hardware.xacro" />
+
+  <macro name="arm" params="side reflect parent color *origin"> 
+    <link name="${side}_arm_base_link" />
+    <joint name="${side}_arm_base_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}_link"/>
+      <child link="${side}_arm_base_link" />
+    </joint>
+
+    <!-- 7.shoulder lift -->
+    <!-- limit:-45~100 deg -->
+    <RS405CB_revolute parent="${side}_arm_base" name="${side}_arm_shoulder_lift_R" vlimit="1.571" llimit="-0.76" ulimit="1.75">
+    <!--RS405CB_revolute parent="${side}_arm_base" name="${side}_arm_shoulder_lift_R" vlimit="3.14" llimit="-3.14" ulimit="3.14"-->
+      <origin xyz="0 0 0" rpy="${-PI/2} ${PI/2} 0" />
+      <axis xyz="0 0 1" />
+    </RS405CB_revolute>
+    <RS405CB_revolute parent="${side}_arm_base" name="${side}_arm_shoulder_lift_L" vlimit="1.571" llimit="-0.76" ulimit="1.75">
+    <!--RS405CB_revolute parent="${side}_arm_base" name="${side}_arm_shoulder_lift_L" vlimit="3.14" llimit="-3.14" ulimit="3.14"-->
+      <origin xyz="0 ${-RS405CB_DEPTH*2} 0" rpy="${PI/2} ${PI/2} 0" />
+      <axis xyz="0 0 1" />
+    </RS405CB_revolute>
+   
+    <!-- 6.shoulder roll -->
+    <RS405CB_revolute parent="${side}_arm_shoulder_lift_L" name="${side}_arm_shoulder_roll" vlimit="1.571" llimit="-1.75" ulimit="0">
+	 <!--RS405CB_revolute parent="${side}_arm_shoulder_lift_L" name="${side}_arm_shoulder_roll" vlimit="3.14" llimit="-3.14" ulimit="3.14"-->
+      <origin xyz="0 ${RS405CB_HEIGHT/2} ${VH_6_W+0.03}" rpy="${PI/2} 0 ${PI}" />
+      <axis xyz="0 0 1" />
+    </RS405CB_revolute>
+    
+    <!-- 5.shoulder pan -->
+    <RS405CB_revolute parent="${side}_arm_shoulder_roll" name="${side}_arm_shoulder_pan" vlimit="3.14" llimit="-1.57" ulimit="1.57">
+    <!--RS405CB_revolute parent="${side}_arm_shoulder_roll" name="${side}_arm_shoulder_pan" vlimit="3.14" llimit="-3.14" ulimit="3.14"-->
+      <origin xyz="${-VH_5_H-0.02} 0 ${-RS405CB_HEIGHT/2}" rpy="${PI} ${-PI/2} 0" />
+      <axis xyz="0 0 1" />
+    </RS405CB_revolute>
+    
+    <!-- 4.elbow flex -->
+    <RS405CB_revolute parent="${side}_arm_shoulder_pan" name="${side}_arm_elbow_flex" vlimit="3.14" llimit="-1.57" ulimit="0">
+    <!--RS405CB_revolute parent="${side}_arm_shoulder_pan" name="${side}_arm_elbow_flex" vlimit="3.14" llimit="-3.14" ulimit="3.14"-->
+      <origin xyz="0 ${RS405CB_DEPTH/2} ${-RS405CB_HEIGHT-VH_4_H-RS405CB_WIDTH/2+0.005}" rpy="${-PI/2} 0 0" />
+      <axis xyz="0 0 1" />
+    </RS405CB_revolute>
+    
+    <!-- 3.forearm flex -->
+    <RS405CB_revolute parent="${side}_arm_elbow_flex" name="${side}_arm_forearm_flex" vlimit="3.14" llimit="-1.57" ulimit="1.57">
+    <!--RS405CB_revolute parent="${side}_arm_elbow_flex" name="${side}_arm_forearm_flex" vlimit="3.14" llimit="-3.14" ulimit="3.14"-->
+      <origin xyz="0 ${VH_3_H-0.005} -${RS405CB_DEPTH/2}" rpy="${PI/2} 0 0" />
+      <axis xyz="0 0 1" />
+    </RS405CB_revolute>
+    
+    <!-- 2.wrist flex -->
+    <RS405CB_revolute parent="${side}_arm_forearm_flex" name="${side}_arm_wrist_flex" vlimit="3.14" llimit="-1.57" ulimit="1.57">
+    <!--RS405CB_revolute parent="${side}_arm_forearm_flex" name="${side}_arm_wrist_flex" vlimit="3.14" llimit="-3.14" ulimit="3.14"-->
+      <origin xyz="-0.012 ${RS405CB_DEPTH/2} ${-RS405CB_DEPTH-VH_2_H-0.02}" rpy="${-PI/2} ${PI/2} 0" />
+      <axis xyz="0 0 1" />
+    </RS405CB_revolute>
+
+  </macro>
+
+</robot>
+
+
+

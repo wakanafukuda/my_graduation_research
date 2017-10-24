@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<robot name="akira" xmlns:xacro="http://ros.org/wiki/xacro">
+
+   <!-- Define a number of dimensions using properties -->
+   <property name="PI" value="3.14159"/>
+
+   <property name="torso_offset_x" value="0.0" />
+   <property name="torso_offset_y" value="0.0" />
+   <property name="torso_offset_z" value="0.55" />
+   
+   <property name="arm_offset_x" value="0.1" />
+   <property name="arm_offset_y" value="-0.20" />
+   <property name="arm_offset_z" value="0.20" />
+
+   <!-- Include all component files -->
+   <xacro:include filename="$(find akira_description)/urdf/materials.urdf.xacro" />
+   <xacro:include filename="$(find akira_description)/urdf/akira_vehicle_real.urdf.xacro" />
+   <xacro:include filename="$(find akira_description)/urdf/akira_torso.urdf.xacro" />
+   <xacro:include filename="$(find akira_description)/urdf/akira_arm.urdf.xacro" />
+   <xacro:include filename="$(find akira_description)/urdf/akira_gripper.urdf.xacro" />
+
+   <!-- Add the base and wheels -->
+   <base name="base" color="Black"/>
+   
+   <!-- Attach the torso -->
+   <torso name="torso" parent="base" color="Grey">
+      <origin xyz="${torso_offset_x} ${torso_offset_y} ${torso_offset_z}" rpy="0 0 0" />
+   </torso>
+   
+   <!-- Attach the right arm -->
+   <arm side="right" reflect="-1" parent="torso" color="White">
+     <origin xyz="${arm_offset_x} ${arm_offset_y} ${arm_offset_z}" rpy="0 0 0" />
+   </arm>
+    
+   <!-- Attach the right gripper -->
+   <gripper side="right" reflect="-1" parent="right_arm_wrist_flex" color="Green">
+     <origin xyz="0 0 0" rpy="0 0 0" /> 
+   </gripper>
+
+</robot>
+
+
+

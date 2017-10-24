@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<robot name="face" xmlns:xacro="http://ros.org/wiki/xacro">
+
+ <!-- FACE_DEPTH: doesn't include its back horn-->
+  <property name="face_size_x" value="0.300" />
+  <property name="face_size_y" value="0.438" />
+  <property name="face_size_z" value="0.294" />
+  
+  <property name="FACE_MESH_SCALE" value="1.0" />
+  
+  <!-- Define the face -->
+  <macro name="face" params="parent name color *origin">
+    <joint name="${parent}_${name}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}_link"/>
+      <child link="${name}_link"/>
+    </joint>
+    
+    <link name="${name}_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <!--mesh filename="package://akira_description/meshes/akira_face.stl" scale="${FACE_MESH_SCALE} ${FACE_MESH_SCALE} ${FACE_MESH_SCALE}" /-->
+          <box size="${face_size_x} ${face_size_y} ${face_size_z}" />
+        </geometry>
+        <material name="${color}" />
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${face_size_x} ${face_size_y} ${face_size_z}" />
+        </geometry>
+      </collision>
+      </link>
+    </macro>
+    
+</robot>

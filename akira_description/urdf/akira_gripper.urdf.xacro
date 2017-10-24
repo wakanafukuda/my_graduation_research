@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+
+<robot name="gripper" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <property name="PI" value="3.14159"/>
+
+  <macro name="gripper" params="side reflect parent color *origin"> 
+
+    <!-- gripper base joint -->
+    <!--RS405CB_revolute parent="${parent}" name="${side}_gripper_base" vlimit="1.571" llimit="0" ulimit="1.57">
+      <origin xyz="${VH_1A_H+VH_1B_H+RS405CB_WIDTH/2-0.005} -0.023 -0.012" rpy="${PI/2} ${-PI/2} 0" />
+      <axis xyz="0 0 1" />
+    </RS405CB_revolute-->
+    
+    <!-- Planning link and joint for the right gripper -->
+
+    <!-- 2014.12.11 modified. -->
+    <!-- the gripper link does NOT connect to the gripper base joint BUT the wrist joint -->
+    <joint name="${side}_gripper_joint" type="fixed">
+      <origin xyz="0.13 0 0" rpy="${PI/2} 0 0"/>
+      <axis xyz="0 0 1" />
+      <parent link="${parent}_link"/>
+      <child link="${side}_gripper_link"/>
+    </joint>
+    
+    <link name="${side}_gripper_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+           <box size="0.001 0.0005 0.0005"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="-0.05 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+
+<!--
+    <joint name="${side}_gripper_joint" type="fixed">
+      <origin xyz="0.04 -0.045 ${-RS405CB_DEPTH/2}" rpy="${PI/2} 0 0"/>
+      <axis xyz="0 0 1" />
+      <parent link="${side}_gripper_base_link"/>
+      <child link="${side}_gripper_link"/>
+    </joint>
+    
+    <link name="${side}_gripper_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+           <box size="0.001 0.0005 0.0005"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="-0.05 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+-->
+   </macro>
+</robot>
+

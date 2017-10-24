@@ -1,0 +1,14 @@
+<launch>
+    
+    <!-- Load the URDF/Xacro model of our robot -->
+    <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find akira_description)/urdf/akira_with_kinect.xacro'" />
+　　<param name="robot_description" command="$(arg urdf_file)" />
+    
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+       <param name="use_gui" value="True" />
+    </node>
+    
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+    
+    <!--node name="rviz" pkg="rviz" type="rviz"-->
+</launch>
