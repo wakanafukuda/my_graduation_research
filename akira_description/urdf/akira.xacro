@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+
+<robot name="akira" xmlns:xacro="http://ros.org/wiki/xacro">
+
+   <!-- Define a number of dimensions using properties -->
+   <property name="PI" value="3.14159"/>
+
+   
+   <property name="torso_offset_x" value="0.0" />
+   <property name="torso_offset_y" value="0.0" />
+   <property name="torso_offset_z" value="0.55" />
+
+   <!--
+   <property name="arm_offset_x" value="0.1" />
+   <property name="arm_offset_y" value="-0.20" />
+   <property name="arm_offset_z" value="0.20" />
+   -->
+   
+   <!-- face_offset_z= ${torso_size_z}/2 + ${face_size_z}/2 -->
+   <!--
+   <property name="face_offset_x" value="-0.03" />
+   <property name="face_offset_y" value="0.0" />
+   <property name="face_offset_z" value="0.532" />
+   -->
+   
+   <property name="camera_offset_x" value="0.1" />
+   <property name="camera_offset_y" value="0.0" />
+   <property name="camera_offset_z" value="0.695" />
+   
+   <property name="laser_offset_x" value="0.19" />
+   <property name="laser_offset_y" value="0.0" />
+   <property name="laser_offset_z" value="0.16" />
+
+   <!-- Include all component files -->
+
+   <xacro:include filename="$(find akira_description)/urdf/materials.urdf.xacro" />
+   
+   <xacro:include filename="$(find akira_description)/urdf/akira_vehicle.urdf.xacro" />
+   <xacro:include filename="$(find akira_description)/urdf/akira_torso.urdf.xacro" />
+   <xacro:include filename="$(find akira_description)/urdf/akira_arm.urdf.xacro" />
+   <!--
+       <xacro:include filename="$(find akira_description)/urdf/akira_gripper.urdf.xacro" />
+   -->
+   <!--
+       <xacro:include filename="$(find akira_description)/urdf/akira_face.urdf.xacro" />
+   -->
+   <xacro:include filename="$(find akira_description)/urdf/kinect.urdf.xacro" />
+   <xacro:include filename="$(find akira_description)/urdf/laser.urdf.xacro" />
+   
+   <!-- Add the base and wheels -->
+   <base name="base" color="Black"/>
+   
+   <!-- Attach the torso -->
+   <torso name="torso" parent="base" color="Danboru">
+      <origin xyz="${torso_offset_x} ${torso_offset_y} ${torso_offset_z}" rpy="0 0 0" />
+   </torso>
+   
+   <!-- Attach the right arm -->
+   <!--
+   <arm side="right" reflect="-1" parent="torso" color="White">
+     <origin xyz="${arm_offset_x} ${arm_offset_y} ${arm_offset_z}" rpy="0 0 0" />
+   </arm>
+   -->
+   
+   <!-- Attach the right gripper -->
+   <!--
+   <gripper side="right" reflect="-1" parent="right_arm_wrist_flex" color="Green">
+     <origin xyz="0 0 0" rpy="0 0 0" /> 
+   </gripper>
+   -->
+
+   <!-- Attach the face -->
+   <!--
+   <face name="face" parent="torso" color="Danboru">
+     <origin xyz="${face_offset_x} ${face_offset_y} ${face_offset_z}" rpy="0 0 0" />
+   </face>
+   -->
+   
+   <!-- Attach the camera -->
+   <camera name="camera" parent="torso" color="Black">
+    <origin xyz="${camera_offset_x} ${camera_offset_y} ${camera_offset_z}" rpy="0 0 0" />
+   </camera>
+   
+   <!-- Attach the laser -->
+   <laser parent="base" color="DarkGrey">
+      <origin xyz="${laser_offset_x} ${laser_offset_y} ${laser_offset_z}" rpy="0 0 0 " />
+   </laser>
+
+
+</robot>

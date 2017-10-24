@@ -1,0 +1,257 @@
+<robot name="akira">
+
+	<!-- vehicle -->
+     <link name="base_link">
+        <visual>
+            <geometry>
+                <cylinder radius="0.25" length="0.3" />
+            </geometry>
+            <material name="Cyan">
+                   <color rgba="0 1 1  1.0"/>
+             </material>
+        </visual>    
+    </link>
+    
+    <link name="wheel_right_link">
+	    <visual>
+	      <geometry>
+		 <cylinder length=".1" radius="0.15"/>
+	      </geometry>
+	      <material name="black">
+		<color rgba="0 0 0 1"/>
+	      </material>
+	    </visual>
+    </link>
+    
+    <link name="wheel_left_link">
+	    <visual>
+	      <geometry>
+		 <cylinder length=".1" radius="0.15"/>
+	      </geometry>
+	      <material name="black">
+		<color rgba="0 0 0 1"/>
+	      </material>
+	    </visual>
+    </link>
+    
+    <link name="wheel_back_link">
+	    <visual>
+	      <geometry>
+		 <cylinder length=".1" radius="0.15"/>
+	      </geometry>
+	      <material name="black">
+		<color rgba="0 0 0 1"/>
+	      </material>
+	    </visual>
+    </link>
+
+	<!-- torso -->
+    <link name="torso_link">
+        <visual>
+            <geometry>
+                <box size="0.29 0.46 0.77" />
+            </geometry>
+             <material name="Yellow">
+                <color rgba="1 1 0 1.0"/>
+            </material>
+       </visual>
+    </link>
+    
+    <!-- arm -->
+    <link name="arm_s7r_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.05 0.045" />
+            </geometry>
+             <material name="Cyan">
+                <color rgba="0 1 1  1.0"/>
+            </material>
+       </visual>
+    </link>
+    <link name="arm_s7l_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.05 0.045" />
+            </geometry>
+             <material name="Cyan">
+                <color rgba="0 1 1  1.0"/>
+            </material>
+       </visual>
+    </link>
+    
+    <link name="arm_s6_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.05 0.045" />
+            </geometry>
+             <material name="Cyan">
+                <color rgba="0 1 1  1.0"/>
+            </material>
+       </visual>
+    </link>
+    
+    <link name="arm_s5_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.05 0.045" />
+            </geometry>
+             <material name="Cyan">
+                <color rgba="0 1 1  1.0"/>
+            </material>
+       </visual>
+    </link>
+    
+    <link name="arm_s4_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.05 0.045" />
+            </geometry>
+             <material name="Cyan">
+                <color rgba="0 1 1  1.0"/>
+            </material>
+       </visual>
+    </link>
+    
+    <link name="arm_s3_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.05 0.045" />
+            </geometry>
+             <material name="Cyan">
+                <color rgba="0 1 1  1.0"/>
+            </material>
+       </visual>
+    </link>
+    
+    <link name="arm_s2_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.05 0.045" />
+            </geometry>
+             <material name="Cyan">
+                <color rgba="0 1 1  1.0"/>
+            </material>
+       </visual>
+    </link>
+    
+    <link name="arm_s1_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.05 0.045" />
+            </geometry>
+             <material name="Cyan">
+                <color rgba="0 1 1  1.0"/>
+            </material>
+       </visual>
+    </link>
+    
+    <!-- sensors -->
+    <link name="lrf_link">
+        <visual>
+            <geometry>
+                <box size="0.05 0.05 0.05" />
+            </geometry>
+             <material name="Green">
+                <color rgba="0 1 0 1.0"/>
+            </material>
+       </visual>
+    </link>
+    
+    
+    <!-- joint -->
+  <joint name="wheel_right_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="wheel_right_link" />
+    <origin xyz="0.125 -0.2165 0" rpy="1.5707 0 0.5236" />
+  </joint>
+  
+  <!--cos30 = 0.15425144988, x=L*sin30, y=L*cos30-->
+  <joint name="wheel_left_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="wheel_left_link" />
+    <origin xyz="0.125 0.2165 0" rpy="-1.5707 0 -0.5236" />
+  </joint>
+  
+  <joint name="wheel_back_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="wheel_back_link" />
+    <origin xyz="-0.25 0 0" rpy="0 -1.5707 0" />
+  </joint>
+
+  <joint name="torso_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="torso_link" />
+    <origin xyz="0 0 0.535" rpy="0 0 0" />
+  </joint>
+  
+  <!-- The servo position specifies its axis position(not its servo position) -->
+  <joint name="arm_s7r_joint" type="revolute">
+    <parent link="torso_link" />
+    <child link="arm_s7r_link" />
+    <origin xyz="0 -0.18 0.23" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-3.1416" upper="3.1416" effort="10" velocity="3" />
+  </joint>
+  
+  <joint name="arm_s7l_joint" type="fixed">
+    <parent link="arm_s7r_link" />
+    <child link="arm_s7l_link" />
+    <origin xyz="0 -0.05 0" rpy="0 0 0" />
+  </joint>
+  
+  <joint name="arm_s6_joint" type="revolute">
+    <parent link="arm_s7l_link" />
+    <child link="arm_s6_link" />
+    <origin xyz="0 -0.06 0" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.5708" upper="0" effort="10" velocity="3" />
+  </joint>
+  
+  <joint name="arm_s5_joint" type="revolute">
+    <parent link="arm_s6_link" />
+    <child link="arm_s5_link" />
+    <origin xyz="0 0 -0.08" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.5708" upper="1.5708" effort="10" velocity="3" />
+  </joint>
+  
+  <joint name="arm_s4_joint" type="revolute">
+    <parent link="arm_s5_link" />
+    <child link="arm_s4_link" />
+    <origin xyz="0 0 -0.065" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2" upper="0" effort="10" velocity="3" />
+  </joint>
+  
+  <joint name="arm_s3_joint" type="revolute">
+    <parent link="arm_s4_link" />
+    <child link="arm_s3_link" />
+    <origin xyz="0 0 -0.055" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.5708" upper="1.5708" effort="10" velocity="3" />
+  </joint>
+  
+  <joint name="arm_s2_joint" type="revolute">
+    <parent link="arm_s3_link" />
+    <child link="arm_s2_link" />
+    <origin xyz="0 0 -0.065" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-1.5708" upper="1.5708" effort="10" velocity="3" />
+  </joint>
+  
+  <joint name="arm_s1_joint" type="revolute">
+    <parent link="arm_s2_link" />
+    <child link="arm_s1_link" />
+    <origin xyz="0 0 -0.08" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5708" effort="10" velocity="3" />
+  </joint>
+  
+  <joint name="lrf_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="lrf_link" />
+    <origin xyz="0.2 0 0.15" rpy="0 0 0" />
+    <axis xyz="0 0 0" />
+  </joint>
+ 
+</robot>

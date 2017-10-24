@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<robot name="akira" xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Define a number of dimensions using properties -->
+  <property name="torso_offset_x" value="0.0" />
+  <property name="torso_offset_y" value="0.0" />
+  <property name="torso_offset_z" value="0.55" />
+  
+  <!-- face_offset_z= ${torso_size_z}/2 + ${face_size_z}/2 -->
+  <property name="face_offset_x" value="0.0" />
+  <property name="face_offset_y" value="0.0" />
+  <property name="face_offset_z" value="0.532" />
+
+  <!-- Include all component files -->
+  <xacro:include filename="$(find akira_description)/urdf/materials.urdf.xacro" />
+  <xacro:include filename="$(find akira_description)/urdf/akira_vehicle_real.urdf.xacro" />
+  <xacro:include filename="$(find akira_description)/urdf/akira_torso.urdf.xacro" />
+  <xacro:include filename="$(find akira_description)/urdf/akira_face.urdf.xacro" />
+
+  <!-- Add the base and wheels -->
+  <base name="base" color="Black"/>
+  
+  <!-- Add the torso -->
+  <torso name="torso" parent="base" color="Grey">
+    <origin xyz="${torso_offset_x} ${torso_offset_y} ${torso_offset_z}" rpy="0 0 0" />
+  </torso>
+  
+  <!-- Add the face -->
+  <face name="face" parent="torso" color="Grey">
+    <origin xyz="${face_offset_x} ${face_offset_y} ${face_offset_z}" rpy="0 0 0" />
+  </face>
+</robot>
+
