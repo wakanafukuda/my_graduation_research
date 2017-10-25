@@ -3,7 +3,7 @@
   
   <!-- Load the URDF/Xacro model of our robot -->
   <!-- param name="robot_description" textfile="$(find akira_description)/urdf/akira.urdf" /-->
-  <param name="robot_description" command="$(find xacro)/xacro --inorder --check-order ../urdf/akira.xacro" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder ../urdf/akira.xacro" />
 
 
   <!-- Publish the robot state -->
