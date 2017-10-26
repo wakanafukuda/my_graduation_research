@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<robot>
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so" >
+      <robotNamespace>/akira</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="base_link" >
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <gazebo reference="torso" >
+    <material>Gazebo/Danboru</material>
+  </gazebo>
+
+  <gazebo reference="laser" >
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+  
+</robot>
+  

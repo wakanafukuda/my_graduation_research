@@ -39,7 +39,7 @@
    -->
    <xacro:include filename="$(find akira_description)/urdf/kinect.urdf.xacro" />
    <xacro:include filename="$(find akira_description)/urdf/laser.urdf.xacro" />
-   
+
    <!-- Add the base and wheels -->
    <base name="base" color="Black"/>
    
