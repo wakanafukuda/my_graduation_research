@@ -3,34 +3,34 @@
 <robot name="arm_hardware" xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- RS405CB_DEPTH: doesn't include its back horn-->
-  <property name="RS405CB_WIDTH" value="0.033" />
-  <property name="RS405CB_HEIGHT" value="0.043" />
-  <property name="RS405CB_DEPTH" value="0.045" />
+  <xacro:property name="RS405CB_WIDTH" value="0.033" />
+  <xacro:property name="RS405CB_HEIGHT" value="0.043" />
+  <xacro:property name="RS405CB_DEPTH" value="0.045" />
   
-  <property name="VH_6_W" value="0.03" />
-  <property name="VH_6_H" value="0.045" />
-  <property name="VH_6_D" value="0.054" />
-  <property name="VH_5_W" value="0.032" />
-  <property name="VH_5_H" value="0.032" />
-  <property name="VH_5_D" value="0.047" />
-  <property name="VH_4_W" value="0.032" />
-  <property name="VH_4_H" value="0.032" />
-  <property name="VH_4_D" value="0.047" />
-  <property name="VH_3_W" value="0.022" />
-  <property name="VH_3_H" value="0.037" />
-  <property name="VH_3_D" value="0.055" />
-  <property name="VH_2_W" value="0.032" />
-  <property name="VH_2_H" value="0.032" />
-  <property name="VH_2_D" value="0.047" />
-  <property name="VH_1A_W" value="0.022" />
-  <property name="VH_1A_H" value="0.037" />
-  <property name="VH_1A_D" value="0.055" />
-  <property name="VH_1B_W" value="0.032" />
-  <property name="VH_1B_H" value="0.032" />
-  <property name="VH_1B_D" value="0.047" />
+  <xacro:property name="VH_6_W" value="0.03" />
+  <xacro:property name="VH_6_H" value="0.045" />
+  <xacro:property name="VH_6_D" value="0.054" />
+  <xacro:property name="VH_5_W" value="0.032" />
+  <xacro:property name="VH_5_H" value="0.032" />
+  <xacro:property name="VH_5_D" value="0.047" />
+  <xacro:property name="VH_4_W" value="0.032" />
+  <xacro:property name="VH_4_H" value="0.032" />
+  <xacro:property name="VH_4_D" value="0.047" />
+  <xacro:property name="VH_3_W" value="0.022" />
+  <xacro:property name="VH_3_H" value="0.037" />
+  <xacro:property name="VH_3_D" value="0.055" />
+  <xacro:property name="VH_2_W" value="0.032" />
+  <xacro:property name="VH_2_H" value="0.032" />
+  <xacro:property name="VH_2_D" value="0.047" />
+  <xacro:property name="VH_1A_W" value="0.022" />
+  <xacro:property name="VH_1A_H" value="0.037" />
+  <xacro:property name="VH_1A_D" value="0.055" />
+  <xacro:property name="VH_1B_W" value="0.032" />
+  <xacro:property name="VH_1B_H" value="0.032" />
+  <xacro:property name="VH_1B_D" value="0.047" />
   
-  <property name="PI" value="3.14159" />
-  <property name="RS405CB_MESH_SCALE" value="0.001" />
+  <xacro:property name="PI" value="3.14159" />
+  <xacro:property name="RS405CB_MESH_SCALE" value="0.001" />
   
   <!--macro name="RS405CB_fixed" params="parent name *origin">
     <joint name="${name}_joint" type="fixed">
@@ -63,9 +63,9 @@
         </geometry>
       </collision>
     </link>
-  </macro-->
+  </xacro:macro-->
   
-  <macro name="RS405CB_revolute" params="parent name llimit ulimit vlimit *origin *axis">
+  <xacro:macro name="RS405CB_revolute" params="parent name llimit ulimit vlimit *origin *axis">
     <joint name="${name}_joint" type="revolute">
       <xacro:insert_block name="origin" />
       <xacro:insert_block name="axis" />
@@ -100,9 +100,9 @@
         </geometry>
       </collision>
     </link>
-  </macro>
+  </xacro:macro>
   
-  <macro name="finger" params="parent name color *origin">
+  <xacro:macro name="finger" params="parent name color *origin">
     <joint name="${name}_joint" type="fixed">
       <xacro:insert_block name="origin" />
       <parent link="${parent}_link"/>
@@ -133,7 +133,7 @@
         </geometry>
       </collision>
     </link>
-  </macro>
+  </xacro:macro>
 
 </robot>
 

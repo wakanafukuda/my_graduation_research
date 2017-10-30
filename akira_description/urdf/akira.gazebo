@@ -11,12 +11,16 @@
     <material>Gazebo/Black</material>
   </gazebo>
 
-  <gazebo reference="torso" >
-    <material>Gazebo/Danboru</material>
+  <gazebo reference="torso_link" >
+    <material>Gazebo/Orange</material>
   </gazebo>
 
-  <gazebo reference="laser" >
+  <gazebo reference="base_laser_bottom" >
     <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <gazebo reference="base_laser" >
+    <material>Gazebo/Red</material>
   </gazebo>
   
 </robot>

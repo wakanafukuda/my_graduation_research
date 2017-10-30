@@ -2,24 +2,24 @@
 <robot name="base" xmlns:xacro="http://ros.org/wiki/xacro">
 
 	<!-- Define a number of dimensions using properties -->
-	<property name="base_radius" value="0.25" />
-	<property name="base_length" value="0.3" />
-	<property name="wheel_radius" value="0.15" />
-	<property name="wheel_length" value="0.1" />
-	<property name="wheel_axis_length" value="0.25" />
-	<property name="wheel_offset_x" value="0" />
-	<property name="wheel_offset_y" value="0" />
-	<property name="wheel_offset_z" value="0" />
+	<xacro:property name="base_radius" value="0.25" />
+	<xacro:property name="base_length" value="0.3" />
+	<xacro:property name="wheel_radius" value="0.15" />
+	<xacro:property name="wheel_length" value="0.1" />
+	<xacro:property name="wheel_axis_length" value="0.25" />
+	<xacro:property name="wheel_offset_x" value="0" />
+	<xacro:property name="wheel_offset_y" value="0" />
+	<xacro:property name="wheel_offset_z" value="0" />
 	
-	<property name="PI" value="3.1415" />
-	<property name="SIN30" value="0.5" />
-	<property name="COS30" value="0.8660" />
+	<xacro:property name="PI" value="3.1415" />
+	<xacro:property name="SIN30" value="0.5" />
+	<xacro:property name="COS30" value="0.8660" />
 	
-	<property name="base_mesh_scale" value="1.0" />
+	<xacro:property name="base_mesh_scale" value="1.0" />
 	
 	<!-- define a wheel -->
 	<!-- Link & joint -->
-	<macro name="wheel" params="suffix parent reflect color">
+	<xacro:macro name="wheel" params="suffix parent reflect color">
 	  <!-- joint -->
 	  <joint name="${parent}_${suffix}_wheel_joint" type="fixed">
 	    <!-- right: x=L*sin30 y=-L*cos30 -->
@@ -40,11 +40,11 @@
 	      <material name="${color}" />
 	    </visual>
 	  </link>
-	</macro>
+	</xacro:macro>
 	
 	<!--  -->
 	<!-- The base link -->
-	<macro name="base" params="name color">
+	<xacro:macro name="base" params="name color">
 	  <!-- link -->
 	  <link name="${name}_link">
 	    <visual>
@@ -62,7 +62,7 @@
 	      </geometry>
 	    </collision>
 	  </link>
-	</macro>
+	</xacro:macro>
 	
 	<!-- The role of the base_footprint is essentially to define 
 	     the elevation of the base above the ground. -->

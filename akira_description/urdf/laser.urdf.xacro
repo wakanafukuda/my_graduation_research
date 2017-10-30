@@ -5,7 +5,7 @@
   <!-- A box-and-cylinder model of the Hokuyo URG-04LX-UG01 laser scanner -->
      
   <!-- Define the laser macro -->
-  <macro name="laser" params="parent color *origin">
+  <xacro:macro name="laser" params="parent color *origin">
     <joint name="${parent}_laser_bottom_joint" type="fixed">
       <xacro:insert_block name="origin" />
       <parent link="${parent}_link"/>
@@ -70,9 +70,7 @@
 		<geometry>
           <cylinder length="0.0175" radius=".0185"/>
         </geometry>
-        <material name="red">
-           <color rgba="0.8 0.1 0.1 1.0"/>
-        </material>          
+        <material name="Red" />
      </visual>
      <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -94,7 +92,7 @@
      <origin xyz="0 0 0.0145" rpy="0 0 0" />
    </joint>
    
-  </macro>
+  </xacro:macro>
  
  </robot>
  

@@ -2,9 +2,9 @@
 
 <robot name="gripper" xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <property name="PI" value="3.14159"/>
+  <xacro:property name="PI" value="3.14159"/>
 
-  <macro name="gripper" params="side reflect parent color *origin"> 
+  <xacro:macro name="gripper" params="side reflect parent color *origin"> 
 
     <!-- gripper base joint -->
     <!--RS405CB_revolute parent="${parent}" name="${side}_gripper_base" vlimit="1.571" llimit="0" ulimit="1.57">
@@ -61,6 +61,6 @@
       </collision>
     </link>
 -->
-   </macro>
+   </xacro:macro>
 </robot>
 

@@ -2,14 +2,14 @@
 <robot name="torso" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Define a number of dimensions using properties -->
   
-  <property name="torso_size_x" value="0.29" />
-  <property name="torso_size_y" value="0.46" />
-  <property name="torso_size_z" value="0.77" />
+  <xacro:property name="torso_size_x" value="0.29" />
+  <xacro:property name="torso_size_y" value="0.46" />
+  <xacro:property name="torso_size_z" value="0.77" />
   
-  <property name="TORSO_MESH_SCALE" value="1.0" />
+  <xacro:property name="TORSO_MESH_SCALE" value="1.0" />
   
   <!-- Define the torso -->
-  <macro name="torso" params="parent name color *origin">
+  <xacro:macro name="torso" params="parent name color *origin">
     <joint name="${parent}_${name}_joint" type="fixed">
       <xacro:insert_block name="origin" />
       <parent link="${parent}_link"/>
@@ -35,6 +35,6 @@
         </geometry>
       </collision>
       </link>
-    </macro>
+    </xacro:macro>
 </robot>
 

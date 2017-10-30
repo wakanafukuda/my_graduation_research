@@ -46,8 +46,7 @@
   </material>
   
   <material name="Danboru">
-    <color rgba="0.8 0.6 0.4 1.0"/>
-    <!-- 0.784 0.627 0.392-->
+    <color rgba="0.78 0.62 0.392 1.0"/>
   </material>
   
 </robot>

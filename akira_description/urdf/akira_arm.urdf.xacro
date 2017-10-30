@@ -4,7 +4,7 @@
 
   <xacro:include filename="$(find akira_description)/urdf/arm_hardware.xacro" />
 
-  <macro name="arm" params="side reflect parent color *origin"> 
+  <xacro:macro name="arm" params="side reflect parent color *origin"> 
     <link name="${side}_arm_base_link" />
     <joint name="${side}_arm_base_joint" type="fixed">
       <xacro:insert_block name="origin" />
@@ -60,7 +60,7 @@
       <axis xyz="0 0 1" />
     </RS405CB_revolute>
 
-  </macro>
+  </xacro:macro>
 
 </robot>
 

@@ -3,15 +3,15 @@
 <robot name="akira" xmlns:xacro="http://ros.org/wiki/xacro">
 
    <!-- Define a number of dimensions using properties -->
-   <property name="PI" value="3.14159"/>
+   <xacro:property name="PI" value="3.14159"/>
 
-   <property name="torso_offset_x" value="0.0" />
-   <property name="torso_offset_y" value="0.0" />
-   <property name="torso_offset_z" value="0.55" />
+   <xacro:property name="torso_offset_x" value="0.0" />
+   <xacro:property name="torso_offset_y" value="0.0" />
+   <xacro:property name="torso_offset_z" value="0.55" />
    
-   <property name="arm_offset_x" value="0.1" />
-   <property name="arm_offset_y" value="-0.20" />
-   <property name="arm_offset_z" value="0.20" />
+   <xacro:property name="arm_offset_x" value="0.1" />
+   <xacro:property name="arm_offset_y" value="-0.20" />
+   <xacro:property name="arm_offset_z" value="0.20" />
 
    <!-- Include all component files -->
    <xacro:include filename="$(find akira_description)/urdf/materials.urdf.xacro" />

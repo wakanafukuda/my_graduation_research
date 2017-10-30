@@ -3,16 +3,16 @@
 <robot name="kinect" xmlns:xacro="http://ros.org/wiki/xacro">
 
    <!-- Define a number of dimensions using properties -->
-   <property name="kinect_size_x" value="0.07271" />
-   <property name="kinect_size_y" value="0.27794" />
-   <property name="kinect_size_z" value="0.070" />
+   <xacro:property name="kinect_size_x" value="0.07271" />
+   <xacro:property name="kinect_size_y" value="0.27794" />
+   <xacro:property name="kinect_size_z" value="0.070" />
    
-   <property name="camera_mesh_scale" value="1.0" />
+   <xacro:property name="camera_mesh_scale" value="1.0" />
    
-   <property name="PI" value="3.1415" />        
+   <xacro:property name="PI" value="3.1415" />        
    
    <!-- Define a camera link for a Kinect -->
-   <macro name="camera" params="parent name color *origin">
+   <xacro:macro name="camera" params="parent name color *origin">
       <joint name="${parent}_${name}_joint" type="fixed">
          <xacro:insert_block name="origin" />
          <parent link="${parent}_link"/>
@@ -132,6 +132,6 @@
       </joint>
       -->
   
-   </macro>
+   </xacro:macro>
 
 </robot>

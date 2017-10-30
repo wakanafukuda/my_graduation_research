@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <robot name="akira" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Define a number of dimensions using properties -->
-  <property name="torso_offset_x" value="0.0" />
-  <property name="torso_offset_y" value="0.0" />
-  <property name="torso_offset_z" value="0.55" />
+  <xacro:property name="torso_offset_x" value="0.0" />
+  <xacro:property name="torso_offset_y" value="0.0" />
+  <xacro:property name="torso_offset_z" value="0.55" />
 
   <!-- Include all component files -->
   <xacro:include filename="$(find akira_description)/urdf/materials.urdf.xacro" />

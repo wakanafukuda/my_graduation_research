@@ -2,14 +2,14 @@
 <robot name="face" xmlns:xacro="http://ros.org/wiki/xacro">
 
  <!-- FACE_DEPTH: doesn't include its back horn-->
-  <property name="face_size_x" value="0.300" />
-  <property name="face_size_y" value="0.438" />
-  <property name="face_size_z" value="0.294" />
+  <xacro:property name="face_size_x" value="0.300" />
+  <xacro:property name="face_size_y" value="0.438" />
+  <xacro:property name="face_size_z" value="0.294" />
   
-  <property name="FACE_MESH_SCALE" value="1.0" />
+  <xacro:property name="FACE_MESH_SCALE" value="1.0" />
   
   <!-- Define the face -->
-  <macro name="face" params="parent name color *origin">
+  <xacro:macro name="face" params="parent name color *origin">
     <joint name="${parent}_${name}_joint" type="fixed">
       <xacro:insert_block name="origin" />
       <parent link="${parent}_link"/>
@@ -33,6 +33,6 @@
         </geometry>
       </collision>
       </link>
-    </macro>
+    </xacro:macro>
     
 </robot>
