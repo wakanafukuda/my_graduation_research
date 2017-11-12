@@ -36,34 +36,24 @@ namespace akira_recog_obj
   }
   
   ros::Publisher pub_obj;
-  ros::Publisher pub_table;
+  //ros::Publisher pub_table;
   ros::Publisher pub_coefficients;
   ros::Subscriber sub;
-
-  int counter;
-  int phase_counter;
-  std_msgs::Float32** temp_data;
-  pcl::ModelCoefficients::Ptr coefficients;
-  pcl_msgs::ModelCoefficients::Ptr ros_coefficients;
   
   void detectTableClass::onInit ()
   {
     ros::NodeHandle& nh = getNodeHandle ();
     pub_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
-    pub_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
-    pub_coefficients = nh.advertise <pcl_msgs::ModelCoefficients> ( "out_coefficients" , 1 );
+    //pub_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
     sub = nh.subscribe ( "/camera/depth_registered/points", 10, &detectTableClass::callback, this );
-    
-    counter = 0;
-    phase_counter = 0;
     
   }
   
   void detectTableClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
   {
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr noisy_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
+    pcl::PointCloud<pcl::PointXYZ>::Ptr noisy_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromROSMsg ( *input_cloud, *noisy_cloud );
-    pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
+    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
     sor.setInputCloud ( noisy_cloud );
     sor.setMeanK ( 50 );
     sor.setStddevMulThresh ( 1.0 );
@@ -74,20 +64,19 @@ namespace akira_recog_obj
     pcl::PCLPointCloud2::Ptr raw_cloud ( new pcl::PCLPointCloud2 );
     pcl::PCLPointCloud2ConstPtr raw_cloudPtr ( raw_cloud );
     pcl::PCLPointCloud2 raw_cloud_filtered;//消すとコアダンプ起きる
-    //    pcl_conversions::toPCL ( *input_cloud, *raw_cloud );//ノイズ除去無の時の変換
     pcl_conversions::toPCL ( *noise_filtered_cloud, *raw_cloud );
     pcl::VoxelGrid<pcl::PCLPointCloud2> vgf;
     vgf.setInputCloud ( raw_cloudPtr );
     vgf.setLeafSize ( 0.01, 0.01, 0.01 );//値を小さくすると細かくなる
     vgf.filter ( raw_cloud_filtered );
     
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr voxeled_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
+    pcl::PointCloud<pcl::PointXYZ>::Ptr voxeled_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromPCLPointCloud2 ( raw_cloud_filtered, *voxeled_cloud );
-
-    
+   
     pcl::ModelCoefficients::Ptr coefficients ( new pcl::ModelCoefficients );
+    //pcl_msgs::ModelCoefficients::Ptr ros_coefficients ( new pcl_msgs::ModelCoefficients );
     pcl::PointIndices::Ptr inliers ( new pcl::PointIndices );
-    pcl::SACSegmentation <pcl::PointXYZRGB> seg;
+    pcl::SACSegmentation <pcl::PointXYZ> seg;
     seg.setOptimizeCoefficients ( true );
     seg.setModelType ( pcl::SACMODEL_PERPENDICULAR_PLANE );
     seg.setMethodType ( pcl::SAC_RANSAC );
@@ -98,15 +87,14 @@ namespace akira_recog_obj
     seg.setInputCloud ( voxeled_cloud->makeShared () );
     seg.segment ( *inliers, *coefficients );
     
-    pcl_msgs::ModelCoefficients::Ptr temp_ros_coefficients ( new pcl_msgs::ModelCoefficients );
-    pcl_conversions::fromPCL ( *coefficients, *temp_ros_coefficients );
+    //pcl_conversions::fromPCL ( *coefficients, *ros_coefficients );
     
-    pcl::ExtractIndices<pcl::PointXYZRGB> extract;
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr object_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr table_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
+    pcl::ExtractIndices<pcl::PointXYZ> extract;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr object_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
+    //pcl::PointCloud<pcl::PointXYZ>::Ptr table_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
 
     sensor_msgs::PointCloud2::Ptr out_obj ( new sensor_msgs::PointCloud2 );
-    sensor_msgs::PointCloud2::Ptr out_table ( new sensor_msgs::PointCloud2 );
+    //sensor_msgs::PointCloud2::Ptr out_table ( new sensor_msgs::PointCloud2 );
 
     if ( inliers->indices.size () == 0 )
       {
@@ -119,80 +107,16 @@ namespace akira_recog_obj
 	extract.setNegative ( true );
 	extract.filter ( *object_cloud );
 	
-	for ( size_t i = 0 ; i < object_cloud->points.size () ; i++ )
-	  {
-	    object_cloud->points[ i ].r = 255;
-	    object_cloud->points[ i ].g = 0;
-	    object_cloud->points[ i ].b = 0;
-	  }
+	//extract.setNegative ( false );
+	//extract.filter ( *table_cloud );
 	
-	extract.setNegative ( false );
-	extract.filter ( *table_cloud );
-	
-	for ( size_t i = 0 ; i < table_cloud->points.size () ; i++ )
-	  {
-	    table_cloud->points[ i ].r = 0;
-	    table_cloud->points[ i ].g = 255;
-	    table_cloud->points[ i ].b = 0;
-	  }
-
 	pcl::toROSMsg ( *object_cloud, *out_obj );
-	pcl::toROSMsg ( *table_cloud, *out_table );
+	//pcl::toROSMsg ( *table_cloud, *out_table );
 
 	pub_obj.publish ( *out_obj );
-	pub_table.publish ( *out_table );
-
-	
-	if ( counter >= 0 && counter < 10 )
-	  {
-	    if ( counter == 0 )
-	      {
-		temp_data = new std_msgs::Float32*[ 10 ];
-	      }
-	    temp_data[ counter ] = new std_msgs::Float32[ 5 ];
-	    for( int i = 0 ; i < 5 ; i++ )
-	      {
-		if( i == 4 )
-		  {
-		    ( temp_data[ counter ] + 4 )->data = ( temp_data[ counter ] + 3 )->data / ( temp_data[ counter ] + 2 )->data;
-		  }
-		( temp_data[ counter ] + i )->data = temp_ros_coefficients->values[ i ];
-	      }
-	    ++counter;
-	  }
-	else if ( counter == 10 )
-	  {
-	    std_msgs::Float32* temp = new std_msgs::Float32[ 5 ];
-	    int m = 9;
-
-	    for( int i = 0 ; i < 10 ; ++i )
-	      {
-		for( int j = 0 ; j < m ; ++j )
-		  {
-		    if( ( temp_data[ j ] + 4 )->data > ( temp_data[ j + 1 ] + 4 )->data )
-		      {
-			for( int k = 0 ; k < 5 ; ++k )
-			  {
-			    temp[ k ].data = ( temp_data[ j ] + k )->data;
-			    ( temp_data[ j ] + k )->data = ( temp_data[ j + 1 ] + k )->data;
-			    ( temp_data[ j + 1 ] + k )->data = temp[ k ].data;
-			  }
-		      }
-		    --m;
-		  }
-	      }
-
-	    ros_coefficients->header.frame_id = temp_ros_coefficients->header.frame_id;
-	    for( int i = 0 ; i < 4 ; ++i )
-	      {
-		ros_coefficients->values[ i ] = ( temp_data[ 4 ] + i )->data;
-	      }
-	    pub_coefficients.publish( ros_coefficients );
-	  }
+	//pub_table.publish ( *out_table );
 	
       }
-    printf ( "%d\n", counter );
-    
   }
 }
 

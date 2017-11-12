@@ -17,16 +17,9 @@ namespace akira_recog_obj
     ~detectTableClass ();
 
     ros::Publisher pub_obj;
-    ros::Publisher pub_table;
-    ros::Publisher pub_coefficients;
+    //ros::Publisher pub_table;
     ros::Subscriber sub;
 
-    int counter;
-    int phase_counter;
-    std_msgs::Float32** temp_data;
-    pcl::ModelCoefficients::Ptr coefficients;
-    pcl_msgs::ModelCoefficients::Ptr ros_coefficients;
-    
     virtual void onInit ();
     void callback ( const sensor_msgs::PointCloud2::ConstPtr& input );
 
