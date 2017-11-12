@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
@@ -36,14 +37,22 @@ namespace akira_recog_obj
   
   ros::Publisher pub_obj;
   ros::Publisher pub_table;
+  ros::Publisher pub_coefficients;
   ros::Subscriber sub;
+
+  int counter;
+  std_msgs::Float32** temp_data;
+  pcl::ModelCoefficients::Ptr coefficients;
+  pcl_msgs::ModelCoefficients::Ptr ros_coefficients;
   
   void detectTableClass::onInit ()
   {
     ros::NodeHandle& nh = getNodeHandle ();
     pub_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
     pub_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
+    pub_coefficients = nh.advertise <pcl_msgs::ModelCoefficients> ( "out_coefficients" , 1 );
     sub = nh.subscribe ( "/camera/depth_registered/points", 10, &detectTableClass::callback, this );
+    counter = 0;
   }
   
   void detectTableClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
@@ -57,7 +66,6 @@ namespace akira_recog_obj
     sor.filter ( *noisy_cloud );
     sensor_msgs::PointCloud2::Ptr noise_filtered_cloud ( new sensor_msgs::PointCloud2 );
     pcl::toROSMsg ( *noisy_cloud, *noise_filtered_cloud );
-
     
     pcl::PCLPointCloud2::Ptr raw_cloud ( new pcl::PCLPointCloud2 );
     pcl::PCLPointCloud2ConstPtr raw_cloudPtr ( raw_cloud );
@@ -71,9 +79,10 @@ namespace akira_recog_obj
     
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr voxeled_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
     pcl::fromPCLPointCloud2 ( raw_cloud_filtered, *voxeled_cloud );
+
+    
     pcl::ModelCoefficients::Ptr coefficients ( new pcl::ModelCoefficients );
     pcl::PointIndices::Ptr inliers ( new pcl::PointIndices );
-
     pcl::SACSegmentation <pcl::PointXYZRGB> seg;
     seg.setOptimizeCoefficients ( true );
     seg.setModelType ( pcl::SACMODEL_PERPENDICULAR_PLANE );
@@ -85,8 +94,8 @@ namespace akira_recog_obj
     seg.setInputCloud ( voxeled_cloud->makeShared () );
     seg.segment ( *inliers, *coefficients );
     
-    pcl_msgs::ModelCoefficients::Ptr ros_coefficients ( new pcl_msgs::ModelCoefficients );
-    pcl_conversions::fromPCL ( *coefficients, *ros_coefficients );
+    pcl_msgs::ModelCoefficients::Ptr temp_ros_coefficients ( new pcl_msgs::ModelCoefficients );
+    pcl_conversions::fromPCL ( *coefficients, *temp_ros_coefficients );
     
     pcl::ExtractIndices<pcl::PointXYZRGB> extract;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr object_cloud ( new pcl::PointCloud<pcl::PointXYZRGB> );
@@ -128,7 +137,58 @@ namespace akira_recog_obj
 
 	pub_obj.publish ( *out_obj );
 	pub_table.publish ( *out_table );
+
+	
+	if ( counter >= 0 && counter < 9 )
+	  {
+	    if ( counter == 0 )
+	      {
+		temp_data = new std_msgs::Float32*[ 10 ];
+	      }
+	    temp_data[ counter ] = new std_msgs::Float32[ 5 ];
+	    for( int i = 0 ; i < 5 ; i++ )
+	      {
+		if( i == 4 )
+		  {
+		    ( temp_data[ counter ] + 4 )->data = ( temp_data[ counter ] + 3 )->data / ( temp_data[ counter ] + 2 )->data;
+		  }
+		( temp_data[ counter ] + i )->data = temp_ros_coefficients->values[ i ];
+	      }
+	    ++counter;
+	  }
+	else if ( counter == 9 )
+	  {
+	    std_msgs::Float32* temp = new std_msgs::Float32[ 5 ];
+	    int m = 9;
+
+	    for( int i = 0 ; i < 10 ; i++ )
+	      {
+		for( int j = 0 ; j < m ; j++ )
+		  {
+		    if( ( temp_data[ j ] + 4 )->data > ( temp_data[ j + 1 ] + 4 )->data )
+		      {
+			for( int k = 0 ; k < 5 ; k++ )
+			  {
+			    temp[ k ].data = ( temp_data[ j ] + k )->data;
+			    ( temp_data[ j ] + k )->data = ( temp_data[ j + 1 ] + k )->data;
+			    ( temp_data[ j + 1 ] + k )->data = temp[ k ].data;
+			  }
+		      }
+		    --m;
+		  }
+	      }
+
+	    ros_coefficients->header.frame_id = temp_ros_coefficients->header.frame_id;
+	    for( int i = 0 ; i < 4 ; i++ )
+	      {
+		ros_coefficients->values[ i ] = ( temp_data[ 4 ] + i )->data;
+	      }
+	    pub_coefficients.publish( ros_coefficients );
+	  }
+	
+	
       }
+    printf ( "%d\n", counter );
     
   }
 }

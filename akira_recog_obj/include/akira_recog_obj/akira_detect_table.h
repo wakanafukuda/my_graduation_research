@@ -3,8 +3,10 @@
 
 #include <stdio.h>
 #include <ros/ros.h>
+#include <std_msgs/Float32.h>
 #include <nodelet/nodelet.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <pcl_conversions/pcl_conversions.h>
 
 namespace akira_recog_obj
 {
@@ -16,8 +18,14 @@ namespace akira_recog_obj
 
     ros::Publisher pub_obj;
     ros::Publisher pub_table;
+    ros::Publisher pub_coefficients;
     ros::Subscriber sub;
 
+    int counter;
+    std_msgs::Float32** temp_data;
+    pcl::ModelCoefficients::Ptr coefficients;
+    pcl_msgs::ModelCoefficients::Ptr ros_coefficients;
+    
     virtual void onInit ();
     void callback ( const sensor_msgs::PointCloud2::ConstPtr& input );
 
