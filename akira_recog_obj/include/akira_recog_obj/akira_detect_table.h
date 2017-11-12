@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <ros/ros.h>
-#include <std_msgs/Float32.h>
 #include <nodelet/nodelet.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -18,7 +17,15 @@ namespace akira_recog_obj
 
     ros::Publisher pub_obj;
     //ros::Publisher pub_table;
+    //ros::Publisher pub_coefficients;
     ros::Subscriber sub;
+
+    double begin;
+    double now;
+    double before;
+    double sum_time;
+
+    int32_t counter;
 
     virtual void onInit ();
     void callback ( const sensor_msgs::PointCloud2::ConstPtr& input );

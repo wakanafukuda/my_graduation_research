@@ -37,8 +37,15 @@ namespace akira_recog_obj
   
   ros::Publisher pub_obj;
   //ros::Publisher pub_table;
-  ros::Publisher pub_coefficients;
+  //ros::Publisher pub_coefficients;
   ros::Subscriber sub;
+
+  double begin;
+  double now;
+  double before;
+  double sum_time;
+
+  int32_t counter;
   
   void detectTableClass::onInit ()
   {
@@ -46,7 +53,12 @@ namespace akira_recog_obj
     pub_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
     //pub_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
     sub = nh.subscribe ( "/camera/depth_registered/points", 10, &detectTableClass::callback, this );
-    
+
+    begin = ros::Time::now().toSec();
+    now = 0;
+    before = 0;
+    sum_time = 0;
+    counter = 0;
   }
   
   void detectTableClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
@@ -115,7 +127,22 @@ namespace akira_recog_obj
 
 	pub_obj.publish ( *out_obj );
 	//pub_table.publish ( *out_table );
-	
+
+	if ( counter < 500 )
+	  {
+	    now = ros::Time::now().toSec();
+	    if ( counter == 0 )
+	      {
+		sum_time += ( now - begin );
+	      }
+	    else if ( counter > 0 )
+	      {
+		sum_time += ( now - before );
+	      }
+	    before = now;
+	    ++counter;
+	    ROS_INFO ( "1 image is processed per %f sec", ( sum_time / counter ) );
+	  }
       }
   }
 }
