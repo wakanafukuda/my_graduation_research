@@ -15,10 +15,10 @@ namespace akira_recog_obj
     detectTableClass ();
     ~detectTableClass ();
 
-    ros::Publisher pub_obj;
-    //ros::Publisher pub_table;
-    //ros::Publisher pub_coefficients;
-    ros::Subscriber sub;
+    ros::Publisher pub_raw_obj;
+    //ros::Publisher pub_raw_table;
+    //ros::Publisher pub_table_coefficients;
+    ros::Subscriber sub_raw_cloud;
 
     double begin;
     double now;

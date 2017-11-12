@@ -9,9 +9,8 @@
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/conversions.h>
-
 #include <pcl_conversions/pcl_conversions.h>
-#include <pcl/conversions.h>
+
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/sample_consensus/sac_model_perpendicular_plane.h>
@@ -35,10 +34,10 @@ namespace akira_recog_obj
     ROS_INFO ( "akira_detect_table nodelet stop" );
   }
   
-  ros::Publisher pub_obj;
-  //ros::Publisher pub_table;
-  //ros::Publisher pub_coefficients;
-  ros::Subscriber sub;
+  ros::Publisher pub_raw_obj;
+  //ros::Publisher pub_raw_table;
+  //ros::Publisher pub_table_coefficients;
+  ros::Subscriber sub_raw_cloud;
 
   double begin;
   double now;
@@ -50,9 +49,9 @@ namespace akira_recog_obj
   void detectTableClass::onInit ()
   {
     ros::NodeHandle& nh = getNodeHandle ();
-    pub_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
-    //pub_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
-    sub = nh.subscribe ( "/camera/depth_registered/points", 10, &detectTableClass::callback, this );
+    pub_raw_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
+    //pub_raw_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
+    sub_raw_cloud = nh.subscribe ( "/camera/depth_registered/points", 10, &detectTableClass::callback, this );
 
     begin = ros::Time::now().toSec();
     now = 0;
@@ -125,8 +124,8 @@ namespace akira_recog_obj
 	pcl::toROSMsg ( *object_cloud, *out_obj );
 	//pcl::toROSMsg ( *table_cloud, *out_table );
 
-	pub_obj.publish ( *out_obj );
-	//pub_table.publish ( *out_table );
+	pub_raw_obj.publish ( *out_obj );
+	//pub_raw_table.publish ( *out_table );
 
 	if ( counter < 500 )
 	  {
