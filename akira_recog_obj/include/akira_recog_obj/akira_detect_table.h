@@ -22,6 +22,7 @@ namespace akira_recog_obj
     ros::Subscriber sub;
 
     int counter;
+    int phase_counter;
     std_msgs::Float32** temp_data;
     pcl::ModelCoefficients::Ptr coefficients;
     pcl_msgs::ModelCoefficients::Ptr ros_coefficients;

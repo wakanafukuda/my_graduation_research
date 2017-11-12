@@ -41,6 +41,7 @@ namespace akira_recog_obj
   ros::Subscriber sub;
 
   int counter;
+  int phase_counter;
   std_msgs::Float32** temp_data;
   pcl::ModelCoefficients::Ptr coefficients;
   pcl_msgs::ModelCoefficients::Ptr ros_coefficients;
@@ -52,7 +53,10 @@ namespace akira_recog_obj
     pub_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
     pub_coefficients = nh.advertise <pcl_msgs::ModelCoefficients> ( "out_coefficients" , 1 );
     sub = nh.subscribe ( "/camera/depth_registered/points", 10, &detectTableClass::callback, this );
+    
     counter = 0;
+    phase_counter = 0;
+    
   }
   
   void detectTableClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
@@ -139,7 +143,7 @@ namespace akira_recog_obj
 	pub_table.publish ( *out_table );
 
 	
-	if ( counter >= 0 && counter < 9 )
+	if ( counter >= 0 && counter < 10 )
 	  {
 	    if ( counter == 0 )
 	      {
@@ -156,18 +160,18 @@ namespace akira_recog_obj
 	      }
 	    ++counter;
 	  }
-	else if ( counter == 9 )
+	else if ( counter == 10 )
 	  {
 	    std_msgs::Float32* temp = new std_msgs::Float32[ 5 ];
 	    int m = 9;
 
-	    for( int i = 0 ; i < 10 ; i++ )
+	    for( int i = 0 ; i < 10 ; ++i )
 	      {
-		for( int j = 0 ; j < m ; j++ )
+		for( int j = 0 ; j < m ; ++j )
 		  {
 		    if( ( temp_data[ j ] + 4 )->data > ( temp_data[ j + 1 ] + 4 )->data )
 		      {
-			for( int k = 0 ; k < 5 ; k++ )
+			for( int k = 0 ; k < 5 ; ++k )
 			  {
 			    temp[ k ].data = ( temp_data[ j ] + k )->data;
 			    ( temp_data[ j ] + k )->data = ( temp_data[ j + 1 ] + k )->data;
@@ -179,13 +183,12 @@ namespace akira_recog_obj
 	      }
 
 	    ros_coefficients->header.frame_id = temp_ros_coefficients->header.frame_id;
-	    for( int i = 0 ; i < 4 ; i++ )
+	    for( int i = 0 ; i < 4 ; ++i )
 	      {
 		ros_coefficients->values[ i ] = ( temp_data[ 4 ] + i )->data;
 	      }
 	    pub_coefficients.publish( ros_coefficients );
 	  }
-	
 	
       }
     printf ( "%d\n", counter );
