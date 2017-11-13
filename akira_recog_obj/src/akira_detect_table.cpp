@@ -19,6 +19,7 @@
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl_ros/filters/filter.h>
+#include <pcl/filters/passthrough.h>
 
 #include "akira_recog_obj/akira_detect_table.h"
 
@@ -76,14 +77,33 @@ namespace akira_recog_obj
     pcl::PCLPointCloud2ConstPtr raw_cloudPtr ( raw_cloud );
     pcl::PCLPointCloud2 raw_cloud_filtered;//消すとコアダンプ起きる
     pcl_conversions::toPCL ( *noise_filtered_cloud, *raw_cloud );
+    
     pcl::VoxelGrid<pcl::PCLPointCloud2> vgf;
     vgf.setInputCloud ( raw_cloudPtr );
     vgf.setLeafSize ( 0.01, 0.01, 0.01 );//値を小さくすると細かくなる
-    vgf.filter ( raw_cloud_filtered );
-    
+    vgf.filter ( raw_cloud_filtered );    
     pcl::PointCloud<pcl::PointXYZ>::Ptr voxeled_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromPCLPointCloud2 ( raw_cloud_filtered, *voxeled_cloud );
-   
+
+    pcl::PointCloud<pcl::PointXYZ>::Ptr through_x;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr through_y;
+    pcl::PointCLoud<pcl::PointXYZ>::Ptr through_z;
+    pcl::PassThrough<pcl::PointXYZ> pass;
+    pass.setInputCloud ( voxeled_cloud );
+    pass.setFilterFieldName ( "x" );
+    pass.setFilterLimits ( 0.0, 2.0 );
+    pass.filter ( *through_x );
+
+    pass.setInputCloud ( through_x );
+    pass.setFilterFiledName ( "y" );
+    pass.setFilterLimits ( -1.0, 1.0 );
+    pass.filter ( *through_y );
+
+    pass.setInputCloud ( through_y );
+    pass.setFilterFiledName ( "z" );
+    pass.setFilterLimits ( -1.0, 1.0 );
+    pass.filter ( *through_z );
+    
     pcl::ModelCoefficients::Ptr coefficients ( new pcl::ModelCoefficients );
     //pcl_msgs::ModelCoefficients::Ptr ros_coefficients ( new pcl_msgs::ModelCoefficients );
     pcl::PointIndices::Ptr inliers ( new pcl::PointIndices );
@@ -95,7 +115,8 @@ namespace akira_recog_obj
     seg.setAxis ( Eigen::Vector3f ( 0.0, 1.0, 0.0 ) );// frame_id: camera_depth_optical_frame
     seg.setEpsAngle ( 30.0f * ( M_PI / 180.0f ) );
     seg.setMaxIterations ( 500 );
-    seg.setInputCloud ( voxeled_cloud->makeShared () );
+    //seg.setInputCloud ( voxeled_cloud->makeShared () );
+    seg.setInputCloud ( through_z->makeShared () );
     seg.segment ( *inliers, *coefficients );
     
     //pcl_conversions::fromPCL ( *coefficients, *ros_coefficients );
