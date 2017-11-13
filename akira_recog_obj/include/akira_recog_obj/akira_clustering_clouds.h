@@ -17,7 +17,7 @@ namespace akira_recog_obj
     ros::Subscriber sub_raw_obj;
     
     virtual void onInit ();
-    void callback ( const sensor_msgs::PointCloud2::ConstPtr& raw_input_object );
+    void callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud );
   };
 }
 #endif

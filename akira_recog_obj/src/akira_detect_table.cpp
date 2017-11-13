@@ -87,7 +87,7 @@ namespace akira_recog_obj
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr through_x;
     pcl::PointCloud<pcl::PointXYZ>::Ptr through_y;
-    pcl::PointCLoud<pcl::PointXYZ>::Ptr through_z;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr through_z;
     pcl::PassThrough<pcl::PointXYZ> pass;
     pass.setInputCloud ( voxeled_cloud );
     pass.setFilterFieldName ( "x" );
@@ -95,12 +95,12 @@ namespace akira_recog_obj
     pass.filter ( *through_x );
 
     pass.setInputCloud ( through_x );
-    pass.setFilterFiledName ( "y" );
+    pass.setFilterFieldName ( "y" );
     pass.setFilterLimits ( -1.0, 1.0 );
     pass.filter ( *through_y );
 
     pass.setInputCloud ( through_y );
-    pass.setFilterFiledName ( "z" );
+    pass.setFilterFieldName ( "z" );
     pass.setFilterLimits ( -1.0, 1.0 );
     pass.filter ( *through_z );
     
