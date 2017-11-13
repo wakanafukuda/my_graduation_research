@@ -28,5 +28,6 @@
   <export>
     <!-- nodeletを定義している .xml ファイルを指定する -->
     <nodelet plugin="${prefix}/plugins/nodelet/akira_detect_table.xml" />
+    <nodelet plugin="${prefix}/plugins/nodelet/akira_clustering_clouds.xml" />
   </export>
 </package>

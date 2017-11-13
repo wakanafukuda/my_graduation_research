@@ -1,0 +1,7 @@
+<library path="lib/libakira_clustering_clouds" >
+  <class name="akira_recog_obj/clusteringCloudsClass" type="akira_recog_obj::clusteringCloudsClass" base_class_type="nodelet::Nodelet" >
+    <description>
+      akira_recog_obj clustering clouds node
+    </description>
+  </class>
+</library>

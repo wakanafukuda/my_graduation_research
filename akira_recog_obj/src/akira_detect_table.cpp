@@ -148,6 +148,7 @@ namespace akira_recog_obj
 	pub_raw_obj.publish ( *out_obj );
 	//pub_raw_table.publish ( *out_table );
 
+	/*
 	if ( counter < 500 )
 	  {
 	    now = ros::Time::now().toSec();
@@ -163,6 +164,7 @@ namespace akira_recog_obj
 	    ++counter;
 	    ROS_INFO ( "1 image is processed per %f sec", ( sum_time / counter ) );
 	  }
+	*/
       }
   }
 }

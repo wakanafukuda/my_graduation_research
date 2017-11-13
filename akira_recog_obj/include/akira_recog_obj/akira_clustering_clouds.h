@@ -15,6 +15,7 @@ namespace akira_recog_obj
     ~clusteringCloudsClass ();
 
     ros::Subscriber sub_raw_obj;
+    ros::Publisher pub_random_obj;
     
     virtual void onInit ();
     void callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud );
