@@ -85,19 +85,14 @@ namespace akira_recog_obj
     pcl::PointCloud<pcl::PointXYZ>::Ptr voxeled_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromPCLPointCloud2 ( raw_cloud_filtered, *voxeled_cloud );
 
-    pcl::PointCloud<pcl::PointXYZ>::Ptr through_x ( new pcl::PointCloud<pcl::PointXYZ> );
-    pcl::PointCloud<pcl::PointXYZ>::Ptr through_y ( new pcl::PointCloud<pcl::PointXYZ> );
+    /*
     pcl::PointCloud<pcl::PointXYZ>::Ptr through_z ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PassThrough<pcl::PointXYZ> pass;
     pass.setInputCloud ( voxeled_cloud );
-    pass.setFilterFieldName ( "x" );
-    pass.setFilterLimits ( -1.0, 1.0 );
-    pass.filter ( *through_x );
-
-    pass.setInputCloud ( through_x );
     pass.setFilterFieldName ( "z" );
-    pass.setFilterLimits ( 0, 1.5 );
+    pass.setFilterLimits ( 0, 1.3 );
     pass.filter ( *through_z );
+    */
     
     pcl::ModelCoefficients::Ptr coefficients ( new pcl::ModelCoefficients );
     //pcl_msgs::ModelCoefficients::Ptr ros_coefficients ( new pcl_msgs::ModelCoefficients );
@@ -110,8 +105,8 @@ namespace akira_recog_obj
     seg.setAxis ( Eigen::Vector3f ( 0.0, 1.0, 0.0 ) );// frame_id: camera_depth_optical_frame
     seg.setEpsAngle ( 30.0f * ( M_PI / 180.0f ) );
     seg.setMaxIterations ( 500 );
-    //seg.setInputCloud ( voxeled_cloud->makeShared () );
-    seg.setInputCloud ( through_z->makeShared () );
+    seg.setInputCloud ( voxeled_cloud->makeShared () );
+    //seg.setInputCloud ( through_z->makeShared () );
     seg.segment ( *inliers, *coefficients );
     
     //pcl_conversions::fromPCL ( *coefficients, *ros_coefficients );
@@ -143,7 +138,6 @@ namespace akira_recog_obj
 	pub_raw_obj.publish ( *out_obj );
 	//pub_raw_table.publish ( *out_table );
 
-	/*
 	if ( counter < 500 )
 	  {
 	    now = ros::Time::now().toSec();
@@ -159,46 +153,8 @@ namespace akira_recog_obj
 	    ++counter;
 	    ROS_INFO ( "1 image is processed per %f sec", ( sum_time / counter ) );
 	  }
-	*/
       }
   }
 }
 
 PLUGINLIB_EXPORT_CLASS ( akira_recog_obj::detectTableClass, nodelet::Nodelet )
-    
-//"nodelet/Tutorials/Porting nodes to nodelets"の差分
-//2015年以降は PLUGINLIB_DECLARE_CLASS の代わりに PLUGINLIB_EXPORT_CLASS が採用されている
-//http://wiki.ros.org/nodelet/Tutorials/Porting%20nodes%20to%20nodelets?action=diff&rev1=17&rev2=18
-//  PLUGINLIB_DECLARE_CLASS ( akira_recog_obj, recogObjMainClass, akira_recog_obj::recogObjMainClass, nodelet::Nodelet );
-//
-//  PLUGINLIB_EXPORT_CLASS ( PLUGIN_PACKAGE_NAME::PLUGIN_CLASS_NAME, BASE_PACKAGE_NAME::BASE_CLASS_NAME )
-//多分，PLUGIN_PACKAGE_NAME は PLUGIN_CLASS_NAME の存在する名前空間
-
-//pcl::PointIndices::indicesはstd::vector<int>だから
-//sizeでベクトルのサイズを参照できる
-//多分inliersに入ってるのは，inliersであると判断された点の順番
-
-//pcl::toROSMsg ( *cloud, *output );は，
-//pcl::PCLPointCloud2::Ptr pcl_output ( new pcl::PCLPointCloud2 );
-//pcl::toPCLPointCLoud2 ( *cloud, *pcl_output );
-//pcl_conversions::fromPCL ( *pcl_output, *output );
-//と同じ．
-
-// SACsegmentation に関して
-// 1 の答えの人
-// https://answers.ros.org/question/61811/pcl-sacsegmentation-setaxis-and-setmodeltype-has-no-effect-in-output/
-// eps_parameter が必要．axis は isModelValid () 関数でしか使われていない．
-// さらに eps_angle_ > 0 の時だけ使われる．( sac_model_parallel_plane.hpp より )
-// eps_angle_ は 0 に初期化されるから，このパラメータを明示的にセットしなければ
-// axis は無視される．( sac_model_parallel_plane.h より )
-//
-// setEpsAngle () は「モデルの法線ベクトルと与えられた軸とでの最大許容範囲」とあるから
-// axis 変数は平面の法線ベクトルを期待している．
-//
-// 0 の答えの人
-// XZ 平面がほしいので，
-// pcl::SACMODEL_PERPENDICULAR_PLANE ( 与えられた軸に対して垂直 )
-// seg.setMaxIterations ( 500 ) ( デフォルトが 50 回と少ない <- キーポイント )
-// seg.setDistanceThreshold ( 0.05 ) ( 平面上の 0.05m 以内のものを採用 )
-// Eigen::Vector3f ( 0.0, 1.0, 0.0 )
-// seg.setEpsAngle ( 30.0f * ( M_PI / 180.0f ) ) ( XZ 平面に対して 30 度以内は平面 )

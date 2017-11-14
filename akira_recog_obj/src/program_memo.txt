@@ -1,0 +1,37 @@
+Nodeletについてのメモ
+//"nodelet/Tutorials/Porting nodes to nodelets"の差分
+//2015年以降は PLUGINLIB_DECLARE_CLASS の代わりに PLUGINLIB_EXPORT_CLASS が採用されている
+//http://wiki.ros.org/nodelet/Tutorials/Porting%20nodes%20to%20nodelets?action=diff&rev1=17&rev2=18
+//  PLUGINLIB_DECLARE_CLASS ( akira_recog_obj, recogObjMainClass, akira_recog_obj::recogObjMainClass, nodelet::Nodelet );
+//
+//  PLUGINLIB_EXPORT_CLASS ( PLUGIN_PACKAGE_NAME::PLUGIN_CLASS_NAME, BASE_PACKAGE_NAME::BASE_CLASS_NAME )
+//多分，PLUGIN_PACKAGE_NAME は PLUGIN_CLASS_NAME の存在する名前空間
+
+//pcl::PointIndices::indicesはstd::vector<int>だから
+//sizeでベクトルのサイズを参照できる
+//多分inliersに入ってるのは，inliersであると判断された点の順番
+
+//pcl::toROSMsg ( *cloud, *output );は，
+//pcl::PCLPointCloud2::Ptr pcl_output ( new pcl::PCLPointCloud2 );
+//pcl::toPCLPointCLoud2 ( *cloud, *pcl_output );
+//pcl_conversions::fromPCL ( *pcl_output, *output );
+//と同じ．
+
+// SACsegmentation に関して
+// 1 の答えの人
+// https://answers.ros.org/question/61811/pcl-sacsegmentation-setaxis-and-setmodeltype-has-no-effect-in-output/
+// eps_parameter が必要．axis は isModelValid () 関数でしか使われていない．
+// さらに eps_angle_ > 0 の時だけ使われる．( sac_model_parallel_plane.hpp より )
+// eps_angle_ は 0 に初期化されるから，このパラメータを明示的にセットしなければ
+// axis は無視される．( sac_model_parallel_plane.h より )
+//
+// setEpsAngle () は「モデルの法線ベクトルと与えられた軸とでの最大許容範囲」とあるから
+// axis 変数は平面の法線ベクトルを期待している．
+//
+// 0 の答えの人
+// XZ 平面がほしいので，
+// pcl::SACMODEL_PERPENDICULAR_PLANE ( 与えられた軸に対して垂直 )
+// seg.setMaxIterations ( 500 ) ( デフォルトが 50 回と少ない <- キーポイント )
+// seg.setDistanceThreshold ( 0.05 ) ( 平面上の 0.05m 以内のものを採用 )
+// Eigen::Vector3f ( 0.0, 1.0, 0.0 )
+// seg.setEpsAngle ( 30.0f * ( M_PI / 180.0f ) ) ( XZ 平面に対して 30 度以内は平面 )
