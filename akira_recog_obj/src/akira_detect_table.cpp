@@ -85,23 +85,18 @@ namespace akira_recog_obj
     pcl::PointCloud<pcl::PointXYZ>::Ptr voxeled_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromPCLPointCloud2 ( raw_cloud_filtered, *voxeled_cloud );
 
-    pcl::PointCloud<pcl::PointXYZ>::Ptr through_x;
-    pcl::PointCloud<pcl::PointXYZ>::Ptr through_y;
-    pcl::PointCloud<pcl::PointXYZ>::Ptr through_z;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr through_x ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::PointCloud<pcl::PointXYZ>::Ptr through_y ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::PointCloud<pcl::PointXYZ>::Ptr through_z ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PassThrough<pcl::PointXYZ> pass;
     pass.setInputCloud ( voxeled_cloud );
     pass.setFilterFieldName ( "x" );
-    pass.setFilterLimits ( 0.0, 2.0 );
+    pass.setFilterLimits ( -1.0, 1.0 );
     pass.filter ( *through_x );
 
     pass.setInputCloud ( through_x );
-    pass.setFilterFieldName ( "y" );
-    pass.setFilterLimits ( -1.0, 1.0 );
-    pass.filter ( *through_y );
-
-    pass.setInputCloud ( through_y );
     pass.setFilterFieldName ( "z" );
-    pass.setFilterLimits ( -1.0, 1.0 );
+    pass.setFilterLimits ( 0, 1.5 );
     pass.filter ( *through_z );
     
     pcl::ModelCoefficients::Ptr coefficients ( new pcl::ModelCoefficients );

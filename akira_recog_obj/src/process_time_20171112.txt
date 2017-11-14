@@ -225,3 +225,28 @@
 [ INFO] [1510479451.669983749]: 1 image is processed per 1.022958
 [ INFO] [1510479452.642691926]: 1 image is processed per 1.022735
 [ INFO] [1510479453.617954865]: 1 image is processed per 1.022525
+
+
+ADD 20171114
+header: 
+  seq: 64
+  stamp: 
+    secs: 1510648582
+    nsecs: 894155733
+  frame_id: camera_depth_optical_frame
+height: 480
+width: 640
+distortion_model: plumb_bob
+D: [0.0, 0.0, 0.0, 0.0, 0.0]
+K: [570.3422241210938, 0.0, 314.5, 0.0, 570.3422241210938, 235.5, 0.0, 0.0, 1.0]
+R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+P: [570.3422241210938, 0.0, 314.5, 0.0, 0.0, 570.3422241210938, 235.5, 0.0, 0.0, 0.0, 1.0, 0.0]
+binning_x: 0
+binning_y: 0
+roi: 
+  x_offset: 0
+  y_offset: 0
+  height: 0
+  width: 0
+  do_rectify: False
+---
