@@ -5,6 +5,7 @@
   
   <!-- $ rosrun nodelet nodelet load akira_recog_obj/recogObjMainClass akira_recog_obj_nodelet __name:=main -->
   <node pkg="nodelet" type="nodelet" name="detector" args="load akira_recog_obj/detectTableClass akira_recog_obj_nodelet" output="screen" />
+  <!--
   <node pkg="nodelet" type="nodelet" name="clustor" args="load akira_recog_obj/clusteringCloudsClass akira_recog_obj_nodelte" output="screen" />
-  
+  -->
 </launch>

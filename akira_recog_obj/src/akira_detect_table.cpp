@@ -85,14 +85,12 @@ namespace akira_recog_obj
     pcl::PointCloud<pcl::PointXYZ>::Ptr voxeled_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromPCLPointCloud2 ( raw_cloud_filtered, *voxeled_cloud );
 
-    /*
     pcl::PointCloud<pcl::PointXYZ>::Ptr through_z ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PassThrough<pcl::PointXYZ> pass;
     pass.setInputCloud ( voxeled_cloud );
     pass.setFilterFieldName ( "z" );
-    pass.setFilterLimits ( 0, 1.3 );
+    pass.setFilterLimits ( 0, 0.8 );
     pass.filter ( *through_z );
-    */
     
     pcl::ModelCoefficients::Ptr coefficients ( new pcl::ModelCoefficients );
     //pcl_msgs::ModelCoefficients::Ptr ros_coefficients ( new pcl_msgs::ModelCoefficients );
@@ -101,12 +99,12 @@ namespace akira_recog_obj
     seg.setOptimizeCoefficients ( true );
     seg.setModelType ( pcl::SACMODEL_PERPENDICULAR_PLANE );
     seg.setMethodType ( pcl::SAC_RANSAC );
-    seg.setDistanceThreshold ( 0.05 );
+    seg.setDistanceThreshold ( 1.5 );//0.05
     seg.setAxis ( Eigen::Vector3f ( 0.0, 1.0, 0.0 ) );// frame_id: camera_depth_optical_frame
-    seg.setEpsAngle ( 30.0f * ( M_PI / 180.0f ) );
-    seg.setMaxIterations ( 500 );
-    seg.setInputCloud ( voxeled_cloud->makeShared () );
-    //seg.setInputCloud ( through_z->makeShared () );
+    seg.setEpsAngle ( 90.0f * ( M_PI / 180.0f ) ); //30.0f * ( M_PI / 180.0f )
+    seg.setMaxIterations ( 300 );//500
+    //seg.setInputCloud ( voxeled_cloud->makeShared () );
+    seg.setInputCloud ( through_z->makeShared () );
     seg.segment ( *inliers, *coefficients );
     
     //pcl_conversions::fromPCL ( *coefficients, *ros_coefficients );
