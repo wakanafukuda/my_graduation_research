@@ -35,9 +35,9 @@ namespace akira_recog_obj
   
   void clusteringCloudsClass::onInit ()
   {
-    ros::NodeHandle& nh = getNodeHandle ();
+    ros::NodeHandle& nh = getMTNodeHandle ();
     sub_raw_obj = nh.subscribe ( "/out_obj" , 10, &clusteringCloudsClass::callback, this );
-    pub_random_obj = nh.advertise <sensor_msgs::PointCloud2> ( "/oub_random_obj", 1 );
+    pub_random_obj = nh.advertise <sensor_msgs::PointCloud2> ( "oub_random_obj", 1 );
   }
   
   void clusteringCloudsClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
@@ -55,7 +55,8 @@ namespace akira_recog_obj
     ec.setSearchMethod ( tree );
     ec.setInputCloud ( input_object );
     ec.extract ( object_indices );
-    
+
+    /*
     for ( std::vector<pcl::PointIndices>::const_iterator it = object_indices.begin () ; it != object_indices.end (); ++it )
       {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr object_cluster ( new pcl::PointCloud<pcl::PointXYZ> );
@@ -71,6 +72,22 @@ namespace akira_recog_obj
 	pcl::toROSMsg ( *object_cluster, *out_random_obj );
 	pub_random_obj.publish ( *out_random_obj );
       }
+    */
+
+    std::vector<pcl::PointIndices>::const_iterator it = object_indices.begin ();
+    pcl::PointCloud<pcl::PointXYZ>::Ptr object_cluster ( new pcl::PointCloud<pcl::PointXYZ> );
+    for ( std::vector<int>::const_iterator pit = it->indices.begin () ; pit != it->indices.end () ; ++pit )
+      {
+	object_cluster->points.push_back ( input_object->points[ *pit ] );
+      }
+    object_cluster->width = object_cluster->points.size ();
+    object_cluster->height = 1;
+    object_cluster->is_dense = true;
+
+    sensor_msgs::PointCloud2::Ptr out_random_obj ( new sensor_msgs::PointCloud2 );
+    pcl::toROSMsg ( *object_cluster, *out_random_obj );
+    pub_random_obj.publish ( *out_random_obj );
+    
   }
 }
 
