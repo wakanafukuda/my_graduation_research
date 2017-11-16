@@ -42,6 +42,7 @@ namespace akira_recog_obj
   
   void clusteringCloudsClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_cloud )
   {
+    std::string frame_id = input_cloud->header.frame_id;
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_object ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromROSMsg ( *input_cloud, *input_object );
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree ( new pcl::search::KdTree<pcl::PointXYZ> );
@@ -86,6 +87,7 @@ namespace akira_recog_obj
 
     sensor_msgs::PointCloud2::Ptr out_random_obj ( new sensor_msgs::PointCloud2 );
     pcl::toROSMsg ( *object_cluster, *out_random_obj );
+    out_random_obj->header.frame_id = frame_id;
     pub_random_obj.publish ( *out_random_obj );
     
   }
