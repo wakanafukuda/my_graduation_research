@@ -36,8 +36,6 @@ namespace akira_recog_obj
   }
   
   ros::Publisher pub_raw_obj;
-  //ros::Publisher pub_raw_table;
-  //ros::Publisher pub_table_coefficients;
   ros::Subscriber sub_raw_cloud;
 
   double begin;
@@ -51,7 +49,6 @@ namespace akira_recog_obj
   {
     ros::NodeHandle& nh = getMTNodeHandle ();
     pub_raw_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
-    //pub_raw_table = nh.advertise <sensor_msgs::PointCloud2> ( "out_table" , 1 );
     sub_raw_cloud = nh.subscribe ( "/camera/depth_registered/points", 10, &detectTableClass::callback, this );
 
     begin = ros::Time::now().toSec();
@@ -93,7 +90,6 @@ namespace akira_recog_obj
     pass.filter ( *through_z );
     
     pcl::ModelCoefficients::Ptr coefficients ( new pcl::ModelCoefficients );
-    //pcl_msgs::ModelCoefficients::Ptr ros_coefficients ( new pcl_msgs::ModelCoefficients );
     pcl::PointIndices::Ptr inliers ( new pcl::PointIndices );
     pcl::SACSegmentation <pcl::PointXYZ> seg;
     seg.setOptimizeCoefficients ( true );
@@ -103,18 +99,13 @@ namespace akira_recog_obj
     seg.setAxis ( Eigen::Vector3f ( 0.0, 1.0, 0.0 ) );// frame_id: camera_depth_optical_frame
     seg.setEpsAngle ( 90.0f * ( M_PI / 180.0f ) ); //30.0f * ( M_PI / 180.0f )
     seg.setMaxIterations ( 300 );//500
-    //seg.setInputCloud ( voxeled_cloud->makeShared () );
     seg.setInputCloud ( through_z->makeShared () );
     seg.segment ( *inliers, *coefficients );
-    
-    //pcl_conversions::fromPCL ( *coefficients, *ros_coefficients );
-    
+        
     pcl::ExtractIndices<pcl::PointXYZ> extract;
     pcl::PointCloud<pcl::PointXYZ>::Ptr object_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
-    //pcl::PointCloud<pcl::PointXYZ>::Ptr table_cloud ( new pcl::PointCloud<pcl::PointXYZ> );
 
     sensor_msgs::PointCloud2::Ptr out_obj ( new sensor_msgs::PointCloud2 );
-    //sensor_msgs::PointCloud2::Ptr out_table ( new sensor_msgs::PointCloud2 );
 
     if ( inliers->indices.size () == 0 )
       {
@@ -127,14 +118,9 @@ namespace akira_recog_obj
 	extract.setNegative ( true );
 	extract.filter ( *object_cloud );
 	
-	//extract.setNegative ( false );
-	//extract.filter ( *table_cloud );
-	
 	pcl::toROSMsg ( *object_cloud, *out_obj );
-	//pcl::toROSMsg ( *table_cloud, *out_table );
 
 	pub_raw_obj.publish ( *out_obj );
-	//pub_raw_table.publish ( *out_table );
 
 	if ( counter < 500 )
 	  {
