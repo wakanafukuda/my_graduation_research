@@ -98,7 +98,7 @@ namespace akira_recog_obj
     seg.setDistanceThreshold ( 1.5 );//0.05
     seg.setAxis ( Eigen::Vector3f ( 0.0, 1.0, 0.0 ) );// frame_id: camera_depth_optical_frame
     seg.setEpsAngle ( 90.0f * ( M_PI / 180.0f ) ); //30.0f * ( M_PI / 180.0f )
-    seg.setMaxIterations ( 300 );//500
+    seg.setMaxIterations ( 500 );//500
     seg.setInputCloud ( through_z->makeShared () );
     seg.segment ( *inliers, *coefficients );
         
