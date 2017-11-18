@@ -86,7 +86,7 @@ namespace akira_recog_obj
     pcl::PassThrough<pcl::PointXYZ> pass;
     pass.setInputCloud ( voxeled_cloud );
     pass.setFilterFieldName ( "z" );
-    pass.setFilterLimits ( 0, 0.8 );
+    pass.setFilterLimits ( 0, 1.5 );
     pass.filter ( *through_z );
     
     pcl::ModelCoefficients::Ptr coefficients ( new pcl::ModelCoefficients );
