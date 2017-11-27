@@ -47,7 +47,7 @@ namespace akira_recog_obj
   
   void detectTableClass::onInit ()
   {
-    ros::NodeHandle& nh = getMTNodeHandle ();
+    ros::NodeHandle& nh = getNodeHandle ();
     pub_raw_obj = nh.advertise <sensor_msgs::PointCloud2> ( "out_obj" , 1 );
     sub_raw_cloud = nh.subscribe ( "/camera/depth_registered/points", 10, &detectTableClass::callback, this );
 
