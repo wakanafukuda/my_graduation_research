@@ -35,7 +35,7 @@ namespace akira_recog_obj
   
   void clusteringCloudsClass::onInit ()
   {
-    ros::NodeHandle& nh = getMTNodeHandle ();
+    ros::NodeHandle& nh = getNodeHandle ();
     sub_raw_obj = nh.subscribe ( "/out_obj" , 10, &clusteringCloudsClass::callback, this );
     pub_random_obj = nh.advertise <sensor_msgs::PointCloud2> ( "oub_random_obj", 1 );
   }
