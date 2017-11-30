@@ -28,7 +28,7 @@ namespace akira_recog_obj
     int32_t counter;
 
     virtual void onInit ();
-    void callback ( const sensor_msgs::PointCloud2::ConstPtr& input );
+    void callback ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds );
 
   };
 }

@@ -27,4 +27,10 @@ namespace akira_recog_obj
   void recogObjMainClass::onInit ()
   {
     ros::NodeHandle& nh = getNodeHandle ();
+    pub_grag_position = nh.advertise <sensor_msgs::PointCloud2> ( "grab_potision", 1 );
+    sub_raw_clouds = nh.subscribe ( "/camera/depth_registered/points", 10, &recogObjMainClass::callback, this );
+  }
+
+  void recogObjMainClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds )
+  {
     
