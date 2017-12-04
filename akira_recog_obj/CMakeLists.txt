@@ -67,9 +67,10 @@ find_package(catkin REQUIRED COMPONENTS nodelet pcl_conversions pcl_msgs pcl_ros
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES akira_detect_table akira_clustering_clouds
+  #  LIBRARIES akira_detect_table akira_clustering_clouds
+  LIBRARIES akira_recog_obj
   CATKIN_DEPENDS nodelet pcl_conversions pcl_msgs pcl_ros roscpp sensor_msgs
-#  DEPENDS system_lib
+  #  DEPENDS system_lib
 )
 
 ###########
@@ -84,8 +85,10 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(akira_detect_table src/akira_detect_table.cpp)
-add_library(akira_clustering_clouds src/akira_clustering_clouds.cpp)
+# add_library(akira_detect_table src/akira_detect_table.cpp)
+# add_library(akira_clustering_clouds src/akira_clustering_clouds.cpp)
+add_library(akira_recog_obj src/akira_recog_obj.cpp)
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -94,7 +97,6 @@ add_library(akira_clustering_clouds src/akira_clustering_clouds.cpp)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/akira_recog_obj_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -107,11 +109,14 @@ add_library(akira_clustering_clouds src/akira_clustering_clouds.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(akira_detect_table ${catkin_LIBRARIES})
-target_link_libraries(akira_clustering_clouds ${catkin_LIBRARIES})
+## target_link_libraries(akira_detect_table ${catkin_LIBRARIES})
+## target_link_libraries(akira_clustering_clouds ${catkin_LIBRARIES})
+target_link_libraries(akira_recog_obj ${catkin_LIBRARIES})
+
 if(catkin_EXPORTED_LIBRARIES)
-  add_dependencies(akira_detect_table ${catkin_EXPORTED_LIBRARIES})
-  add_dependencies(akira_clustering_clouds ${catkin_EXPORTED_LIBRARIES})
+  add_dependencies(akira_recog_obj ${catkin_EXPORTED_LIBRARIES})
+  #  add_dependencies(akira_detect_table ${catkin_EXPORTED_LIBRARIES})
+  #  add_dependencies(akira_clustering_clouds ${catkin_EXPORTED_LIBRARIES})
 endif()
 
 #############
@@ -129,7 +134,7 @@ endif()
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS akira_detect_table akira_clustering_clouds
+install(TARGETS akira_recog_obj
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -144,8 +149,9 @@ install(DIRECTORY include/akira_recog_obj/
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  ./plugins/nodelet/akira_detect_table.xml
-  ./plugins/nodelet/akira_clustering_clouds.xml
+  ./plugins/nodelet/akira_recog_obj.xml
+  #  ./plugins/nodelet/akira_detect_table.xml
+  #  ./plugins/nodelet/akira_clustering_clouds.xml
   ./launch/akira_recog_obj.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

@@ -1,0 +1,16 @@
+#include "akira_recog_obj/akira_recog_obj.h"
+
+namespace akira_recog_obj
+{
+  void recogObjMainClass::filtering_clouds1 ( sensor_msgs::PointCloud2::ConstPtr& input_clouds, pcl::PointCloud::Ptr& filtered_clouds )
+  {
+    pcl::PointCloud<pcl::PointXYZ>::Ptr noisy_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::fromROSMsg ( *input_clouds, *noisy_clouds );
+    
+    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+    sor.setInputCloud ( noisy_clouds );
+    sor.setMeanK ( 50 );
+    sor.setStddevMulThresh ( 1.0 );
+    sor.filter ( *filtered_clouds );
+  }
+}

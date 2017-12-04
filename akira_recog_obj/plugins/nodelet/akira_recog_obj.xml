@@ -1,0 +1,7 @@
+<library path="lib/libakira_recog_obj" >
+  <class name="akira_recog_obj/recogObjMainClass" type="akira_recog_obj::recogObjMainClass" base_class_type="nodelet::Nodelet" >
+    <description>
+      akira_recog_obj recognition main node
+    </description>
+  </class>
+</library>
