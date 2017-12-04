@@ -26,6 +26,8 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl_ros/filters/filter.h>
 
+//#include "akira_recog_obj/akira_table_filter.h"
+
 namespace akira_recog_obj
 {
   class recogObjMainClass : public nodelet::Nodelet
@@ -38,12 +40,24 @@ namespace akira_recog_obj
     ros::Subscriber sub_raw_clouds;
 
     bool makeFilter;
+    bool tableIsDetected;
+
+    //    table_filter table_filter;
     
     virtual void onInit ();
     void callback ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds );
-
+    
     void filtering_clouds1 ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds );
+    void filtering_clouds2 ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds );
+
+    void detecting_table ( pcl::PointCloud<pcl::PointXYZ>::Ptr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& extracted_table_clouds );
+    void making_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& input_clouds );
+    
+    void noise_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& noisy_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& no_noisy_clouds );
+    void voxel_grid ( pcl::PointCloud<pcl::PointXYZ>::Ptr& no_voxeled_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& voxeled_clouds );
+    void passthrough_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& uncut_clouds, std::string axis, double max, double min, pcl::PointCloud<pcl::PointXYZ>::Ptr& cut_clouds );  
   };
+
 }
 
 #endif
