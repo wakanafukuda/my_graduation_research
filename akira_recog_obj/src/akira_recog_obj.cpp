@@ -24,7 +24,7 @@ namespace akira_recog_obj
   void recogObjMainClass::onInit ()
   {
     ros::NodeHandle& nh = getNodeHandle ();
-    pub_grab_position = nh.advertise <sensor_msgs::PointCloud2> ( "grab_potision", 1 );
+    pub_grab_position = nh.advertise <sensor_msgs::PointCloud2> ( "grab_position", 1 );
     sub_raw_clouds = nh.subscribe ( "/camera/depth_registered/points", 10, &recogObjMainClass::callback, this );
 
     makeFilter = false;
@@ -61,7 +61,7 @@ namespace akira_recog_obj
     pcl::PointCloud<pcl::PointXYZ>::Ptr noisy_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr no_voxeled_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromROSMsg ( *input_clouds, *uncut_clouds );
-    passthrough_filter ( uncut_clouds, "z", 2.0, 0, noisy_clouds );
+    passthrough_filter ( uncut_clouds, "z", 2.5, 0, noisy_clouds );
     noise_filter ( noisy_clouds, no_voxeled_clouds );
     voxel_grid ( no_voxeled_clouds, filtered_clouds );    
   }
@@ -82,8 +82,8 @@ namespace akira_recog_obj
     seg.setMethodType ( pcl::SAC_RANSAC );
     seg.setDistanceThreshold ( 1.5 );
     seg.setAxis ( Eigen::Vector3f ( 0.0, 1.0, 0.0 ) );
-    seg.setEpsAngle ( 30.0f * ( M_PI / 180.0f ) );
-    seg.setMaxIterations ( 500 );
+    seg.setEpsAngle ( 90.0f * ( M_PI / 180.0f ) );
+    seg.setMaxIterations ( 300 );
     seg.setInputCloud ( input_clouds->makeShared () );
     seg.segment ( *inliers, *coefficients );
 
@@ -98,7 +98,7 @@ namespace akira_recog_obj
 	tableIsDetected = true;
 	extract.setInputCloud ( input_clouds );
 	extract.setIndices ( inliers );
-	extract.setNegative ( true );
+	extract.setNegative ( false );
 	extract.filter ( *extracted_table_clouds );
      }
   }
@@ -130,7 +130,7 @@ namespace akira_recog_obj
     pcl_conversions::toPCL( *converted1_no_voxeled_clouds, *converted2_no_voxeled_clouds );
     pcl::VoxelGrid<pcl::PCLPointCloud2> vgf;
     vgf.setInputCloud ( converted2_no_voxeled_cloudsPtr );
-    vgf.setLeafSize ( 0.01, 0.01, 0.01 );
+    vgf.setLeafSize ( 0.02, 0.02, 0.02 );
     vgf.filter ( raw_voxeled_clouds );
     pcl::fromPCLPointCloud2 ( raw_voxeled_clouds, *voxeled_clouds );
   }
