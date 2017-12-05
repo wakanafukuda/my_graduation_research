@@ -26,7 +26,7 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl_ros/filters/filter.h>
 
-//#include "akira_recog_obj/akira_table_filter.h"
+#include "akira_recog_obj/akira_table_filter.h"
 
 namespace akira_recog_obj
 {
@@ -42,8 +42,10 @@ namespace akira_recog_obj
     bool makeFilter;
     bool tableIsDetected;
 
-    //    table_filter table_filter;
-    
+    table_filter* t_filter;
+    table_filter* t_filter_data;
+    int* makeFilterCounter;
+
     virtual void onInit ();
     void callback ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds );
     

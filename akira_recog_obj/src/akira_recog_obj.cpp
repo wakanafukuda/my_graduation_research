@@ -19,7 +19,9 @@ namespace akira_recog_obj
   bool makeFilter;
   bool tableIsDetected;
 
-  //  table_filter table_filter;
+  table_filter* t_filter;
+  table_filter* t_filter_data; 
+  int* makeFilterCounter;
   
   void recogObjMainClass::onInit ()
   {
@@ -29,6 +31,11 @@ namespace akira_recog_obj
 
     makeFilter = false;
     tableIsDetected = false;
+
+    t_filter = new table_filter;
+    t_filter_data = new table_filter[ 10 ];
+    makeFilterCounter = new int;
+    *makeFilterCounter = 0;
   }
 
   void recogObjMainClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds )
@@ -47,10 +54,10 @@ namespace akira_recog_obj
 	detecting_table ( filtered_clouds, extracted_table_clouds );
 	if ( tableIsDetected )
 	  {
-	    //making_filter ( extracted_table_clouds );
 	    pcl::toROSMsg ( *extracted_table_clouds, *output );
 	    pub_grab_position.publish ( *output );
 	    ROS_INFO ( "result: %d", output->is_dense );
+	    making_filter ( extracted_table_clouds );
  	  }
       }
   }
@@ -105,12 +112,26 @@ namespace akira_recog_obj
 
   void recogObjMainClass::making_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& input_clouds )
   {
-    //    table_filter temp_data;
-    //    temp_data.max.setAll ( 10 );
-    //    temp_data.min.setAll ( -10 );
+    t_filter_data[ *makeFilterCounter ].max.setAll ( -10 );
+    t_filter_data[ *makeFilterCounter ].min.setAll ( 10 );
     
+    for ( pcl::PointCloud<pcl::PointXYZ>::iterator pit = input_clouds->points.begin () ; pit != input_clouds->points.end () ; ++pit )
+      {
+	if ( pit->x > t_filter_data[ *makeFilterCounter ].max.getX () )
+	  t_filter_data[ *makeFilterCounter ].max.setX ( pit->x );
+	if ( pit->x < t_filter_data[ *makeFilterCounter ].min.getX () )
+	  t_filter_data[ *makeFilterCounter ].min.setX ( pit->x );
+	if ( pit->y > t_filter_data[ *makeFilterCounter ].max.getY () )
+	  t_filter_data[ *makeFilterCounter ].max.setY ( pit->y );
+	if ( pit->y < t_filter_data[ *makeFilterCounter ].min.getY () )
+	  t_filter_data[ *makeFilterCounter ].min.setY ( pit->y );
+	if ( pit->z > t_filter_data[ *makeFilterCounter ].max.getZ () )
+	  t_filter_data[ *makeFilterCounter ].max.setZ ( pit->z );
+	if ( pit->z < t_filter_data[ *makeFilterCounter ].min.getZ () )
+	  t_filter_data[ *makeFilterCounter ].min.setZ ( pit->z );
+      }
   }
-
+  
   void recogObjMainClass::noise_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& noisy_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& no_noisy_clouds )
   {
     pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;

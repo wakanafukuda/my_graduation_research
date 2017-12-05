@@ -19,6 +19,10 @@ namespace akira_recog_obj
     void setX ( double num ) { x = num; }
     void setY ( double num ) { y = num; }
     void setZ ( double num ) { z = num; }
+
+    double getX () { return x; }
+    double getY () { return y; }
+    double getZ () { return z; }
     
   };
   
