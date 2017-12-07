@@ -45,6 +45,9 @@ namespace akira_recog_obj
       {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
 	filtering_clouds2 ( input_clouds, filtered_clouds );
+	ROS_INFO ( "success making filter" );
+	pcl::toROSMsg ( *filtered_clouds, *output );
+	pub_grab_position.publish ( *output );
       }
     else
       {
@@ -56,7 +59,6 @@ namespace akira_recog_obj
 	  {
 	    pcl::toROSMsg ( *extracted_table_clouds, *output );
 	    pub_grab_position.publish ( *output );
-	    ROS_INFO ( "result: %d", output->is_dense );
 	    making_filter ( extracted_table_clouds );
  	  }
       }
@@ -75,8 +77,15 @@ namespace akira_recog_obj
 
   void recogObjMainClass::filtering_clouds2 ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds )
   {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cut_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::PointCloud<pcl::PointXYZ>::Ptr uncut_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cut_clouds_x ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cut_clouds_y ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr noisy_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::fromROSMsg ( *input_clouds, *uncut_clouds );
+    passthrough_filter ( uncut_clouds, "x", t_filter->max.getX (), t_filter->min.getX (), cut_clouds_x );
+    passthrough_filter ( cut_clouds_x, "y", t_filter->min.getY (), ( t_filter->min.getY () - 1.5 ), cut_clouds_y );
+    passthrough_filter ( cut_clouds_y, "z", t_filter->max.getZ (), t_filter->min.getZ (), noisy_clouds );
+    noise_filter ( noisy_clouds, filtered_clouds );
   }
 
   void recogObjMainClass::detecting_table ( pcl::PointCloud<pcl::PointXYZ>::Ptr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& extracted_table_clouds )
@@ -114,8 +123,8 @@ namespace akira_recog_obj
   {
     if ( *makeFilterCounter < 10 )
       {
-	t_filter_data[ *makeFilterCounter ].max.setAll ( -10 );
-	t_filter_data[ *makeFilterCounter ].min.setAll ( 10 );
+	t_filter_data[ *makeFilterCounter ].max.setAll ( -100 );
+	t_filter_data[ *makeFilterCounter ].min.setAll ( 100 );
 	
 	for ( pcl::PointCloud<pcl::PointXYZ>::iterator pit = input_clouds->points.begin () ; pit != input_clouds->points.end () ; ++pit )
 	  {
@@ -132,10 +141,63 @@ namespace akira_recog_obj
 	    if ( pit->z < t_filter_data[ *makeFilterCounter ].min.getZ () )
 	      t_filter_data[ *makeFilterCounter ].min.setZ ( pit->z );
 	  }
+	*makeFilterCounter += 1;
+	ROS_INFO ( "Counter: %d", *makeFilterCounter );
       }
     else if ( *makeFilterCounter == 10 )
       {
-
+	double temp_data;
+	for ( int i = 0 ; i < 9 ; i++ )
+	  {
+	    for ( int j = 9 ; j > i + 1 ; j-- )
+	      {
+		if ( t_filter_data[ j ].max.getX () > t_filter_data[ j - 1 ].max.getX () )
+		  {
+		    temp_data = t_filter_data[ j ].max.getX ();
+		    t_filter_data[ j ].max.setX ( t_filter_data[ j - 1 ].max.getX () );
+		    t_filter_data[ j - 1 ].max.setX ( temp_data );
+		  }
+		if ( t_filter_data[ j ].min.getX () > t_filter_data[ j - 1 ].min.getX () )
+		  {
+		    temp_data = t_filter_data[ j ].min.getX ();
+		    t_filter_data[ j ].min.setX ( t_filter_data[ j - 1 ].min.getX () );
+		    t_filter_data[ j - 1 ].min.setX ( temp_data );
+		  }
+		if ( t_filter_data[ j ].max.getY () > t_filter_data[ j - 1 ].max.getY () )
+		  {
+		    temp_data = t_filter_data[ j ].max.getY ();
+		    t_filter_data[ j ].max.setY ( t_filter_data[ j - 1 ].max.getY () );
+		    t_filter_data[ j - 1 ].max.setY ( temp_data );
+		  }
+		if ( t_filter_data[ j ].min.getY () > t_filter_data[ j - 1 ].min.getY () )
+		  {
+		    temp_data = t_filter_data[ j ].min.getY ();
+		    t_filter_data[ j ].min.setY ( t_filter_data[ j - 1 ].min.getY () );
+		    t_filter_data[ j - 1 ].max.setY ( temp_data );
+		  }
+		if ( t_filter_data[ j ].max.getZ () > t_filter_data[ j - 1 ].max.getZ () )
+		  {
+		    temp_data = t_filter_data[ j ].max.getZ ();
+		    t_filter_data[ j ].max.setZ ( t_filter_data[ j - 1 ].max.getZ () );
+		    t_filter_data[ j - 1 ].max.setZ ( temp_data );
+		  }
+		if ( t_filter_data[ j ].min.getZ () > t_filter_data[ j - 1 ].min.getZ () )
+		  {
+		    temp_data = t_filter_data[ j ].min.getZ ();
+		    t_filter_data[ j ].min.setZ ( t_filter_data[ j - 1 ].min.getZ () );
+		    t_filter_data[ j - 1 ].min.setZ ( temp_data );
+		  }
+	      }
+	  }
+	t_filter->max.setX ( t_filter_data[ 4 ].max.getX () );
+	t_filter->min.setX ( t_filter_data[ 4 ].min.getX () );
+	t_filter->max.setY ( t_filter_data[ 4 ].max.getY () );
+	t_filter->min.setY ( t_filter_data[ 4 ].min.getY () );
+	t_filter->max.setZ ( t_filter_data[ 4 ].max.getZ () );
+	t_filter->min.setZ ( t_filter_data[ 4 ].min.getZ () );
+	delete[] t_filter_data;
+	ROS_INFO ( "pushed table filter value" );
+	makeFilter = true;
       }
   }
   
