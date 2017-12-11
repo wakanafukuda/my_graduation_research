@@ -25,6 +25,7 @@
 #include <pcl/sample_consensus/sac_model_perpendicular_plane.h>
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl_ros/filters/filter.h>
+#include <pcl/common/transforms.h>
 
 #include "akira_recog_obj/akira_table_filter.h"
 
@@ -57,7 +58,8 @@ namespace akira_recog_obj
     
     void noise_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& noisy_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& no_noisy_clouds );
     void voxel_grid ( pcl::PointCloud<pcl::PointXYZ>::Ptr& no_voxeled_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& voxeled_clouds );
-    void passthrough_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& uncut_clouds, std::string axis, double max, double min, pcl::PointCloud<pcl::PointXYZ>::Ptr& cut_clouds );  
+    void passthrough_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& uncut_clouds, std::string axis, double max, double min, pcl::PointCloud<pcl::PointXYZ>::Ptr& cut_clouds );
+    void matrix_transform_x ( pcl::PointCloud<pcl::PointXYZ>::Ptr& no_transformed_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& transformed_clouds, double angle );
   };
 
 }
