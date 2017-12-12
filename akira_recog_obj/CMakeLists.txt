@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(akira_recog_obj)
 
-find_package(catkin REQUIRED COMPONENTS nodelet pcl_conversions pcl_msgs pcl_ros roscpp sensor_msgs)
+find_package(catkin REQUIRED COMPONENTS nodelet pcl_conversions pcl_msgs pcl_ros tf roscpp sensor_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -97,6 +97,7 @@ add_library(akira_recog_obj src/akira_recog_obj.cpp)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+add_executable(akira_tf_broadcaster src/akira_tf_broadcaster.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -112,6 +113,7 @@ add_library(akira_recog_obj src/akira_recog_obj.cpp)
 ## target_link_libraries(akira_detect_table ${catkin_LIBRARIES})
 ## target_link_libraries(akira_clustering_clouds ${catkin_LIBRARIES})
 target_link_libraries(akira_recog_obj ${catkin_LIBRARIES})
+target_link_libraries(akira_tf_broadcaster ${catkin_LIBRARIES})
 
 if(catkin_EXPORTED_LIBRARIES)
   add_dependencies(akira_recog_obj ${catkin_EXPORTED_LIBRARIES})

@@ -73,10 +73,10 @@ namespace akira_recog_obj
     pcl::fromROSMsg ( *input_clouds, *uncut_clouds );
     passthrough_filter ( uncut_clouds, "z", 2.0, 0, noisy_clouds );
     noise_filter ( noisy_clouds, no_voxeled_clouds );
-    //voxel_grid ( no_voxeled_clouds, filtered_clouds );
+    voxel_grid ( no_voxeled_clouds, filtered_clouds );
     
-    voxel_grid ( no_voxeled_clouds, voxeled_clouds );
-    matrix_transform_x ( voxeled_clouds, filtered_clouds, -15 );
+    //voxel_grid ( no_voxeled_clouds, voxeled_clouds );
+    //matrix_transform_x ( voxeled_clouds, filtered_clouds, -15 );
     
   }
 
@@ -88,10 +88,10 @@ namespace akira_recog_obj
     pcl::PointCloud<pcl::PointXYZ>::Ptr cut_clouds_y ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr noisy_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr noise_cut_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
-    //pcl::fromROSMsg ( *input_clouds, *uncut_clouds );
+    pcl::fromROSMsg ( *input_clouds, *uncut_clouds );
     
-    pcl::fromROSMsg ( *input_clouds, *no_transformed_clouds );
-    matrix_transform_x ( no_transformed_clouds, uncut_clouds, -15 );
+    //pcl::fromROSMsg ( *input_clouds, *no_transformed_clouds );
+    //matrix_transform_x ( no_transformed_clouds, uncut_clouds, -15 );
     
     passthrough_filter ( uncut_clouds, "x", t_filter->max.getX (), t_filter->min.getX (), cut_clouds_x );
     passthrough_filter ( cut_clouds_x, "y", t_filter->min.getY (), ( t_filter->min.getY () - 1.5 ), cut_clouds_y );
