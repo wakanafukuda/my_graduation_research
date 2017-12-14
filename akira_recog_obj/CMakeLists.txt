@@ -88,6 +88,7 @@ include_directories(
 # add_library(akira_detect_table src/akira_detect_table.cpp)
 # add_library(akira_clustering_clouds src/akira_clustering_clouds.cpp)
 add_library(akira_recog_obj src/akira_recog_obj.cpp)
+# add_library(akira_tf_broadcaster src/akira_tf_broadcaster.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -117,6 +118,7 @@ target_link_libraries(akira_tf_broadcaster ${catkin_LIBRARIES})
 
 if(catkin_EXPORTED_LIBRARIES)
   add_dependencies(akira_recog_obj ${catkin_EXPORTED_LIBRARIES})
+  #  add_dependencies(akira_tf_broadcaster ${catkin_LIBRARIES})
   #  add_dependencies(akira_detect_table ${catkin_EXPORTED_LIBRARIES})
   #  add_dependencies(akira_clustering_clouds ${catkin_EXPORTED_LIBRARIES})
 endif()
@@ -152,6 +154,7 @@ install(DIRECTORY include/akira_recog_obj/
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
   ./plugins/nodelet/akira_recog_obj.xml
+  #  ./plugins/nodelet/akira_tf_broadcaster.xml
   #  ./plugins/nodelet/akira_detect_table.xml
   #  ./plugins/nodelet/akira_clustering_clouds.xml
   ./launch/akira_recog_obj.launch

@@ -1,0 +1,7 @@
+<library path="lib/libakira_tf_broadcaster" >
+  <class name="akira_recog_obj/cloudsTfTransformClass" type="akira_recog_obj::cloudsTfTransformClass" base_class_type="nodelet::Nodelet" >
+    <description>
+      akira_recog_obj tf transform node
+    </description>
+  </class>
+</library>
