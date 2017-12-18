@@ -7,6 +7,7 @@
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
+#include <tf/transform_listener.h>
 
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl/PCLPointCloud2.h>
