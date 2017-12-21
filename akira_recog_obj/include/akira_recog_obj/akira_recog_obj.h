@@ -16,6 +16,7 @@
 
 #include <pcl/conversions.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <sensor_msgs/point_cloud_conversion.h>
 
 #include <pcl_ros/filters/statistical_outlier_removal.h>
 #include <pcl/filters/extract_indices.h>
@@ -41,6 +42,8 @@ namespace akira_recog_obj
     ros::Publisher pub_grab_position;
     ros::Subscriber sub_raw_clouds;
 
+    tf::TransformListener tl_camera_to_base_link;
+
     bool makeFilter;
     bool tableIsDetected;
 
@@ -51,8 +54,8 @@ namespace akira_recog_obj
     virtual void onInit ();
     void callback ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds );
     
-    void filtering_clouds1 ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds );
-    void filtering_clouds2 ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds );
+    void filtering_clouds1 ( sensor_msgs::PointCloud2::Ptr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds );
+    void filtering_clouds2 ( sensor_msgs::PointCloud2::Ptr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds );
 
     void detecting_table ( pcl::PointCloud<pcl::PointXYZ>::Ptr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& extracted_table_clouds );
     void making_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& input_clouds );
@@ -60,7 +63,7 @@ namespace akira_recog_obj
     void noise_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& noisy_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& no_noisy_clouds );
     void voxel_grid ( pcl::PointCloud<pcl::PointXYZ>::Ptr& no_voxeled_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& voxeled_clouds );
     void passthrough_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& uncut_clouds, std::string axis, double max, double min, pcl::PointCloud<pcl::PointXYZ>::Ptr& cut_clouds );
-    void matrix_transform_x ( pcl::PointCloud<pcl::PointXYZ>::Ptr& no_transformed_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& transformed_clouds, double angle );
+    void transform_pointclouds ( std::string target_frame, const sensor_msgs::PointCloud2::ConstPtr& input_clouds, std::string fixed_frame, sensor_msgs::PointCloud2::Ptr& transformed_clouds );
   };
 
 }
