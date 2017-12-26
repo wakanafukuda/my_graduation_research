@@ -46,7 +46,7 @@ int main ( int argc, char** argv )
 {
   ros::init ( argc, argv, "akira_tf_broadcaster" );
   ros::NodeHandle nh;
-  
+
   tf::TransformBroadcaster br_camera_to_base_frame;
   tf::TransformBroadcaster br_base_frame_to_base_link;
   tf::Transform transform_camera_to_base_frame;

@@ -15,8 +15,6 @@ namespace akira_recog_obj
 
   ros::Publisher pub_grab_position;
   ros::Subscriber sub_raw_clouds;
-
-  tf::TransformListener tl_camera_to_base_link;
   
   bool makeFilter;
   bool tableIsDetected;
@@ -29,7 +27,7 @@ namespace akira_recog_obj
   {
     ros::NodeHandle& nh = getNodeHandle ();
     pub_grab_position = nh.advertise <sensor_msgs::PointCloud2> ( "grab_position", 1 );
-    sub_raw_clouds = nh.subscribe ( "/camera/depth_registered/points", 10, &recogObjMainClass::callback, this );
+    sub_raw_clouds = nh.subscribe ( "/output", 10, &recogObjMainClass::callback, this );
 
     makeFilter = false;
     tableIsDetected = false;
@@ -43,13 +41,11 @@ namespace akira_recog_obj
   void recogObjMainClass::callback ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds )
   {
     sensor_msgs::PointCloud2::Ptr output ( new sensor_msgs::PointCloud2 );
-    sensor_msgs::PointCloud2::Ptr transformed_clouds ( new sensor_msgs::PointCloud2 );
-    transform_pointclouds ( "camera_link", input_clouds, "base_link", transformed_clouds );
 
     if ( makeFilter )
       {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
-	filtering_clouds2 ( transformed_clouds, filtered_clouds );
+	filtering_clouds2 ( input_clouds, filtered_clouds );
 	ROS_INFO ( "success making filter" );
 	pcl::toROSMsg ( *filtered_clouds, *output );
 	pub_grab_position.publish ( *output );
@@ -58,7 +54,7 @@ namespace akira_recog_obj
       {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
 	pcl::PointCloud<pcl::PointXYZ>::Ptr extracted_table_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
-	filtering_clouds1 ( transformed_clouds, filtered_clouds );
+	filtering_clouds1 ( input_clouds, filtered_clouds );
 	detecting_table ( filtered_clouds, extracted_table_clouds );
 	if ( tableIsDetected )
 	  {
@@ -69,33 +65,30 @@ namespace akira_recog_obj
       }
   }
   
-  void recogObjMainClass::filtering_clouds1 ( sensor_msgs::PointCloud2::Ptr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds )
+  void recogObjMainClass::filtering_clouds1 ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds )
   {
     pcl::PointCloud<pcl::PointXYZ>::Ptr uncut_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr noisy_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr no_voxeled_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr voxeled_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromROSMsg ( *input_clouds, *uncut_clouds );
-    passthrough_filter ( uncut_clouds, "z", 2.0, 0, noisy_clouds );
+    passthrough_filter ( uncut_clouds, "x", 2.0, 0, noisy_clouds );
     noise_filter ( noisy_clouds, no_voxeled_clouds );
     voxel_grid ( no_voxeled_clouds, filtered_clouds );
     
   }
 
-  void recogObjMainClass::filtering_clouds2 ( sensor_msgs::PointCloud2::Ptr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds )
+  void recogObjMainClass::filtering_clouds2 ( const sensor_msgs::PointCloud2::ConstPtr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& filtered_clouds )
   {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr no_transformed_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr uncut_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr cut_clouds_x ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::PointCloud<pcl::PointXYZ>::Ptr cut_clouds_y ( new pcl::PointCloud<pcl::PointXYZ> );
-    pcl::PointCloud<pcl::PointXYZ>::Ptr noisy_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
-    pcl::PointCloud<pcl::PointXYZ>::Ptr noise_cut_clouds ( new pcl::PointCloud<pcl::PointXYZ> );
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cut_clouds_z ( new pcl::PointCloud<pcl::PointXYZ> );
     pcl::fromROSMsg ( *input_clouds, *uncut_clouds );
-    
     passthrough_filter ( uncut_clouds, "x", t_filter->max.getX (), t_filter->min.getX (), cut_clouds_x );
-    passthrough_filter ( cut_clouds_x, "y", t_filter->min.getY (), ( t_filter->min.getY () - 1.5 ), cut_clouds_y );
-    passthrough_filter ( cut_clouds_y, "z", t_filter->max.getZ (), t_filter->min.getZ (), noisy_clouds );
-    noise_filter ( noisy_clouds, filtered_clouds );
+    passthrough_filter ( cut_clouds_x, "y", t_filter->max.getY (), t_filter->min.getY (), cut_clouds_y );
+    passthrough_filter ( cut_clouds_y, "z", ( t_filter->max.getZ () + 1.5 ), t_filter->max.getZ (), cut_clouds_z );
+    noise_filter ( cut_clouds_z, filtered_clouds );
   }
 
   void recogObjMainClass::detecting_table ( pcl::PointCloud<pcl::PointXYZ>::Ptr& input_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& extracted_table_clouds )
@@ -107,9 +100,9 @@ namespace akira_recog_obj
     seg.setModelType ( pcl::SACMODEL_PERPENDICULAR_PLANE );
     seg.setMethodType ( pcl::SAC_RANSAC );
     seg.setDistanceThreshold ( 0.02 );//1.5
-    seg.setAxis ( Eigen::Vector3f ( 0.0, 1.0, 0.0 ) );
+    seg.setAxis ( Eigen::Vector3f ( 0.0, 0.0, 1.0 ) );
     seg.setEpsAngle ( 30.0f * ( M_PI / 180.0f ) );
-    seg.setMaxIterations ( 300 );
+    seg.setMaxIterations ( 400 );
     seg.setInputCloud ( input_clouds->makeShared () );
     seg.segment ( *inliers, *coefficients );
 
@@ -244,22 +237,6 @@ namespace akira_recog_obj
     pass.filter ( *cut_clouds );
   }
 
-  void transform_pointclouds ( std::string target_frame, const sensor_msgs::PointCloud2::ConstPtr& input_clouds, std::string fixed_frame, sensor_msgs::PointCloud2::Ptr& transformed_clouds )
-  {
-    sensor_msgs::PointCloud temp_input_clouds;
-    sensor_msgs::PointCloud::Ptr temp_transformed_clouds ( new sensor_msgs::PointCloud );
-    try
-      {
-	sensor_msgs::convertPointCloud2ToPointCloud ( *input_clouds, temp_input_clouds );
-	tl_camera_to_base_link.transformPointCloud ( target_frame, ros::Time ( 0 ), temp_input_clouds, fixed_frame, *temp_transformed_clouds );
-      }
-    catch ( tf::TransformException ex )
-      {
-	ROS_ERROR ( "%s", ex.what () );
-	ros::Duration ( 1.0 ).sleep ();
-      }
-    sensor_msgs::convertPointCloudToPointCloud2 ( *temp_transformed_clouds, *transformed_clouds );
-  }
 }
 
 PLUGINLIB_EXPORT_CLASS ( akira_recog_obj::recogObjMainClass, nodelet::Nodelet )
