@@ -87,7 +87,7 @@ namespace akira_recog_obj
     pcl::fromROSMsg ( *input_clouds, *uncut_clouds );
     passthrough_filter ( uncut_clouds, "x", t_filter->max.getX (), t_filter->min.getX (), cut_clouds_x );
     passthrough_filter ( cut_clouds_x, "y", t_filter->max.getY (), t_filter->min.getY (), cut_clouds_y );
-    passthrough_filter ( cut_clouds_y, "z", ( t_filter->max.getZ () + 1.5 ), t_filter->max.getZ (), cut_clouds_z );
+    passthrough_filter ( cut_clouds_y, "z", t_filter->max.getZ () + 1.5, t_filter->max.getZ (), cut_clouds_z );
     noise_filter ( cut_clouds_z, filtered_clouds );
   }
 
