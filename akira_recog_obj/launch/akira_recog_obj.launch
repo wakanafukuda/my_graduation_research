@@ -1,8 +1,11 @@
 <?xml version="1.0" ?>
 <launch>
   <!-- $ rosrun nodelet nodelet manager __name:=akira_recog_obj_nodelet -->
+  <node pkg="akira_recog_obj" type="akira_tf_broadcaster" name="akira_tf_broadcaster" output="screen" />
+  <node pkg="akira_recog_obj" type="akira_tf_listener" name="akira_tf_listener" output="screen" />
+  
   <node pkg="nodelet" type="nodelet" name="akira_recog_obj_nodelet" args="manager" output="screen" >
-    <param name="num_worker_threads" value="2" />
+    <param name="num_worker_threads" value="1" />
   </node>
     
   <!-- $ rosrun nodelet nodelet load akira_recog_obj/recogObjMainClass akira_recog_obj_nodelet __name:=main -->
