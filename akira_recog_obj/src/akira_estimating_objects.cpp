@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <visualization_msgs/Marker.h>
 
 namespace akira_recog_obj
@@ -24,7 +25,7 @@ namespace akira_recog_obj
       ROS_INFO ( "akira estimating objects node stop." );
     }
 
-    void estObjCb ( const visualization_msgs::Marker& msg )
+    void estObjCb ( const visualization_msgs::MarkerArray& msg )
     {
       ROS_INFO ( "get object" );
     }
@@ -33,7 +34,7 @@ namespace akira_recog_obj
 
 int main ( int argc, char** argv )
 {
-  ros::init ( argc, argv, "akira_estimating_objects node" );
+  ros::init ( argc, argv, "akira_estimating_objects" );
   akira_recog_obj::estObjClass obj;
 
   ros::spin ();
