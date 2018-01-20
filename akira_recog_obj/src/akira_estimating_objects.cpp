@@ -5,14 +5,14 @@
 
 namespace akira_recog_obj
 {
-  ros::NodeHandle nh;
-  ros::Subscriber sub_obj_ary;
-  ros::Publisher pub_obj_shape;
-  ros::Publisher pub_obj_line;
-  
   class estObjClass
   {
   public:
+    ros::NodeHandle nh;
+    ros::Subscriber sub_obj_ary;
+    ros::Publisher pub_obj_shape;
+    ros::Publisher pub_obj_line;
+  
     estObjClass ()
     {
       ROS_INFO ( "akira estimating objects node start." );
