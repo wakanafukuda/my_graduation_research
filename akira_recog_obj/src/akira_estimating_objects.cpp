@@ -38,7 +38,7 @@ namespace akira_recog_obj
       int length = 0;
       for ( auto it = std::begin ( dt->markers ) ; it != std::end ( dt->markers ) ; ++it )
 	{
-	  ROS_INFO ( "%d", ++length );
+	  ROS_INFO ( "%f %f %f", it->points[ 0 ].x, it->points[ 0 ].y, it->points[ 0 ].z );
 	}
     }
   };
