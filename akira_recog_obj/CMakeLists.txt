@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS nodelet pcl_conversions pcl_msgs pcl_ros
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+add_compile_options(-std=c++11)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed

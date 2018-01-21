@@ -3,6 +3,7 @@
 #include <visualization_msgs/MarkerArray.h>
 
 #include <sstream>
+#include <array>
 
 namespace akira_recog_obj
 {
@@ -33,6 +34,12 @@ namespace akira_recog_obj
       ss << dt->markers[ 0 ].header.frame_id;
       msg.data = ss.str ();
       ROS_INFO ( "%s", msg.data.c_str () );
+
+      int length = 0;
+      for ( auto it = std::begin ( dt->markers ) ; it != std::end ( dt->markers ) ; ++it )
+	{
+	  ROS_INFO ( "%d", ++length );
+	}
     }
   };
 }
