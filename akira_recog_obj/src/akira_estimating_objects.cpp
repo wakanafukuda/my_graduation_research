@@ -1,7 +1,8 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <visualization_msgs/Marker.h>
+
+#include <sstream>
 
 namespace akira_recog_obj
 {
@@ -25,9 +26,13 @@ namespace akira_recog_obj
       ROS_INFO ( "akira estimating objects node stop." );
     }
 
-    void estObjCb ( const visualization_msgs::MarkerArray& msg )
+    void estObjCb ( const visualization_msgs::MarkerArray::Ptr& dt )
     {
-      ROS_INFO ( "get object" );
+      std_msgs::String msg;
+      std::stringstream ss;
+      ss << dt->markers[ 0 ].header.frame_id;
+      msg.data = ss.str ();
+      ROS_INFO ( "%s", msg.data.c_str () );
     }
   };
 }
