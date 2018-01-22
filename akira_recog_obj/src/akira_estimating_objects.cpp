@@ -12,8 +12,9 @@
 #include <sensor_msgs/point_cloud_conversion.h>
 
 //#include <sstream>
+#include <algorithm>
 #include <vector>
-#include <array>
+//#include <array>
 
 namespace akira_recog_obj
 {
@@ -39,26 +40,39 @@ namespace akira_recog_obj
       ROS_INFO ( "akira estimating objects node stop." );
     }
 
-    void estObjCb ( const visualization_msgs::MarkerArray::Ptr& raw_data )
+    void estObjCb ( const visualization_msgs::MarkerArray::Ptr& input_data )
     {
       /*
       std_msgs::String msg;
       std::stringstream ss;
-      ss << raw_data->markers[ 0 ].header.frame_id;
+      ss << input_data->markers[ 0 ].header.frame_id;
       msg.data = ss.str ();
       ROS_INFO ( "%s", msg.data.c_str () );
 
-      for ( auto it = std::begin ( raw_data->markers ) ; it != std::end ( raw_data->markers ) ; ++it )
+      for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
 	{
 	  ROS_INFO ( "%f %f %f", it->points[ 0 ].x, it->points[ 0 ].y, it->points[ 0 ].z );
 	}
       */
+      
       std::vector<geometry_msgs::Pose> obj_pose;
       pcl::PointCloud<pcl::PointXYZ>::Ptr obj_data ( new pcl::PointCloud<pcl::PointXYZ> );
-      for ( auto it = std::begin ( raw_data->markers ) ; it != std::end ( raw_data->markers ) ; ++it )
+      std::vector<geometry_msgs::Point> temp;
+      for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
 	{
 	  obj_pose.push_back ( it->pose );
+
 	  for ( auto its = std::begin ( it->points ) ; its != std::end ( it->points ) ; ++its )
+	    {
+	      geometry_msgs::Point temp_point;
+	      temp_point.x = its->x;
+	      temp_point.y = its->y;
+	      temp_point.z = its->z;
+	      temp.push_back ( temp_point );
+	    }
+	  std::sort ( temp.begin (), temp.end (), [] ( const geometry_msgs::Point& a, const geometry_msgs::Point& b ) { return a.z < b.z; } );
+	  
+	  for ( auto its = temp.begin ()  ; its != temp.end () ; ++its )
 	    {
 	      obj_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
 	    }
@@ -68,6 +82,9 @@ namespace akira_recog_obj
       sensor_msgs::PointCloud2::Ptr output ( new sensor_msgs::PointCloud2 );
       pcl::toROSMsg ( *obj_data, *output );
       pub_pcl_obj.publish ( *output );
+      //delete temp;
+      //delete obj_data;
+      //delete output;
     }
   };
 }
