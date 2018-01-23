@@ -56,8 +56,10 @@ namespace akira_recog_obj
       */
       
       std::vector<geometry_msgs::Pose> obj_pose;
+      pcl::PointCloud<pcl::PointXYZ>::Ptr obj_sorted_data ( new pcl::PointCloud<pcl::PointXYZ> );
       pcl::PointCloud<pcl::PointXYZ>::Ptr obj_data ( new pcl::PointCloud<pcl::PointXYZ> );
       std::vector<geometry_msgs::Point> temp;
+
       for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
 	{
 	  obj_pose.push_back ( it->pose );
@@ -72,16 +74,31 @@ namespace akira_recog_obj
 	    }
 	  std::sort ( temp.begin (), temp.end (), [] ( const geometry_msgs::Point& a, const geometry_msgs::Point& b ) { return a.z < b.z; } );
 	  
-	  for ( auto its = temp.begin ()  ; its != temp.end () ; ++its )
+	  for ( auto its = temp.begin () ; its != temp.end () ; ++its )
 	    {
-	      obj_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
+	      obj_sorted_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
+	    }
+	  
+	  geometry_msgs::Point& obj_data_max = temp.back ();
+	  geometry_msgs::Point& obj_data_min = temp.front ();
+	  double obj_data_middle1 = ( obj_data_max.z - obj_data_min.z ) / 3.0;
+	  double obj_data_middle2 = ( obj_data_max.z - obj_data_min.z ) * 2.0 / 3.0;
+	  for ( auto its = temp.begin () ; its != temp.end () ; ++its )
+	    {
+	      if ( ( obj_data_middle1 > its->z ) || ( obj_data_middle2 < its->z ) )
+		{
+		  obj_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
+		}
 	    }
 	}
       
-      obj_data->header.frame_id = "camera_link";
+      
+      //obj_sorted_data->header.frame_id = "camera_link";
       sensor_msgs::PointCloud2::Ptr output ( new sensor_msgs::PointCloud2 );
       pcl::toROSMsg ( *obj_data, *output );
       pub_pcl_obj.publish ( *output );
+
+      std::vector<geometry_msgs::Point>( ).swap ( temp );
       //delete temp;
       //delete obj_data;
       //delete output;
