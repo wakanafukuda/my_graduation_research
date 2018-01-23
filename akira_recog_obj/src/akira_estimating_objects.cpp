@@ -93,7 +93,7 @@ namespace akira_recog_obj
 	}
       
       
-      //obj_sorted_data->header.frame_id = "camera_link";
+      obj_data->header.frame_id = "camera_link";
       sensor_msgs::PointCloud2::Ptr output ( new sensor_msgs::PointCloud2 );
       pcl::toROSMsg ( *obj_data, *output );
       pub_pcl_obj.publish ( *output );
