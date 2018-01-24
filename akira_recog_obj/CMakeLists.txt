@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(akira_recog_obj)
 
-find_package(catkin REQUIRED COMPONENTS nodelet pcl_conversions pcl_msgs pcl_ros tf roscpp sensor_msgs)
+find_package(catkin REQUIRED COMPONENTS nodelet pcl_conversions pcl_msgs pcl_ros tf roscpp sensor_msgs object_recognition_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)

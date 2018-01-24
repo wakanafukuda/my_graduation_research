@@ -27,17 +27,17 @@ int main ( int argc, char** argv )
     }
   */
 
-  tf::TransformBroadcaster br_base_frame_to_base_link;
+  //tf::TransformBroadcaster br_base_frame_to_base_link;
   tf::TransformBroadcaster br_base_link_to_camera_link;
-  tf::Transform transform_base_frame_to_base_link;
+  //tf::Transform transform_base_frame_to_base_link;
   tf::Transform transform_base_link_to_camera_link;
 
   ros::Rate rate ( 5.0 );
   while ( nh.ok () )
     {
-      transform_base_frame_to_base_link.setRotation ( tf::createQuaternionFromRPY ( 0, 0, 0 ) );
-      transform_base_frame_to_base_link.setOrigin ( tf::Vector3 ( 0.0, 0.0, 1.0 ) ); // x y z
-      br_base_frame_to_base_link.sendTransform ( tf::StampedTransform ( transform_base_frame_to_base_link, ros::Time::now (), "base_frame", "base_link" ) );
+      //transform_base_frame_to_base_link.setRotation ( tf::createQuaternionFromRPY ( 0, 0, 0 ) );
+      //transform_base_frame_to_base_link.setOrigin ( tf::Vector3 ( 0.0, 0.0, 1.0 ) ); // x y z
+      //br_base_frame_to_base_link.sendTransform ( tf::StampedTransform ( transform_base_frame_to_base_link, ros::Time::now (), "base_frame", "base_link" ) );
 
       transform_base_link_to_camera_link.setRotation ( tf::createQuaternionFromRPY ( 0, ( 3.14 / 180 ) * 50, 0 ) );
       transform_base_link_to_camera_link.setOrigin ( tf::Vector3 ( 0.0, 0.0, 0.2 ) );
