@@ -120,12 +120,12 @@ namespace akira_recog_obj
 	  else
 	    {
 	      geometry_msgs::Pose table_pose = table_array->tables[ 0 ].pose;
-	      float theta = M_PI / 4;
+	      float theta = M_PI / 2;
 	      Eigen::Affine3f transform = Eigen::Affine3f::Identity ();
-	      transform.translation () << -table_pose.position.x, -table_pose.position.y, -table_pose.position.z;
+	      transform.translation () << 0.0, 0.0, 0.0;
 	      transform.rotate ( Eigen::AngleAxisf ( theta, Eigen::Vector3f::UnitY () ) );
 	      pcl::transformPointCloud ( *obj_sorted_data, *transformed_data, transform );
-	      transformed_data->header.frame_id = "camera_llink";
+	      transformed_data->header.frame_id = "camera_link";
 	      pcl::toROSMsg ( *transformed_data, *transformed_output );
 	      pub_pcl_trans.publish ( *transformed_output );
 	    }
