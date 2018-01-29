@@ -33,6 +33,34 @@
 
 namespace akira_recog_obj
 {
+  class object_data_set
+  {
+  public:
+    double bottom_y_max;
+    double bottom_y_min;
+    double up_y_max;
+    double up_y_min;
+    double x_max;
+    double x_min;
+    double z_max;
+    double z_min;
+    std::size_t size;
+    
+    object_data_set ()
+    {
+      bottom_y_max = -100;
+      bottom_y_min = 100;
+      up_y_max = -100;
+      up_y_min = 100;
+      x_max = -100;
+      x_min = 100;
+      z_max = -100;
+      z_min = 100;
+    }
+
+    ~object_data_set () { }
+  };
+  
   class estObjClass
   {
   public:
@@ -88,9 +116,12 @@ namespace akira_recog_obj
 	    {
 	      obj_sorted_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
 	    }
-	  
-	  std::size_t obj_data_size = temp.size ();
-	  std::cout << "size: " << obj_data_size << std::endl;
+
+	  object_data_set obj_data;
+	  obj_data.size = temp.size ();
+	  std::cout << "size: " << obj_data.size << std::endl;
+	  //std::size_t obj_data_size = temp.size ();
+	  //std::cout << "size: " << obj_data_size << std::endl;
 	  std::vector<geometry_msgs::Point>( ).swap ( temp );
 	  
 	  //geometry_msgs::Pose table_pose = table_array->tables[ 0 ].pose;
@@ -100,7 +131,6 @@ namespace akira_recog_obj
 	  transform.rotate ( Eigen::AngleAxisf ( theta_z, Eigen::Vector3f::UnitZ() ) );
 	  pcl::transformPointCloud ( *obj_sorted_data, *transformed_data, transform );
 
-	  //std::size_t data_counter = 0;
 	  double bottom_max = -100;
 	  double bottom_min = 100;
 	  double up_max = -100;
@@ -111,95 +141,68 @@ namespace akira_recog_obj
 	  double height_min = 100;
 	  for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = transformed_data->begin () ; it != transformed_data->end () ; ++it )
 	    {
+	      /*
 	      if ( it->x > center_x_max )
-		{
-		  center_x_max = it->x;
-		}
+		center_x_max = it->x;
 	      else if ( it->x < center_x_min )
-		{
-		  center_x_min = it->x;
-		}
+		center_x_min = it->x;
+	      
 	      if ( it->z > height_max )
-		{
-		  height_max = it->z;
-		}
+		height_max = it->z;
 	      else if ( it->z < height_min )
-		{
-		  height_min = it->z;
-		}
+		height_min = it->z;
+	      */
+	      if ( it->x > obj_data.x_max )
+		obj_data.x_max = it->x;
+	      else if ( it->x < obj_data.x_min )
+		obj_data.x_min = it->x;
+	      
+	      if ( it->z > obj_data.z_max )
+		obj_data.z_max = it->z;
+	      else if ( it->z < obj_data.z_min )
+		obj_data.z_min = it->z;
 	    }
 	  
 	  for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = transformed_data->begin () ; it != transformed_data->end () ; ++it )
 	    {
+	      /*
 	      if ( it->z < ( height_min + 0.02 ) )
 		{
 		  if ( it->y > bottom_max )
-		    {
-		      bottom_max = it->y;
-		    }
+		    bottom_max = it->y;
 		  else if ( it->y < bottom_min )
-		    {
-		      bottom_min = it->y;
-		    }
+		    bottom_min = it->y;
 		}
 	      else if ( it->z > ( height_max - 0.02 ) )
 		{
 		  if ( it->y > up_max )
-		    {
-		      up_max = it->y;
-		    }
+		    up_max = it->y;
 		  else if ( it->y < up_min )
-		    {
-		      up_min = it->y;
-		    }
+		    up_min = it->y;
+		}
+	      */
+	      if ( it->z < ( obj_data.z_min + 0.02 ) )
+		{
+		  if ( it->y > obj_data.bottom_y_max )
+		    obj_data.bottom_y_max = it->y;
+		  else if ( it->y < obj_data.bottom_y_min )
+		    obj_data.bottom_y_min = it->y;
+		}
+	      else if ( it->z > ( obj_data.z_max - 0.02 ) )
+		{
+		  if ( it->y > obj_data.up_y_max )
+		    obj_data.up_y_max = it->y;
+		  else if ( it->y < obj_data.up_y_min )
+		    obj_data.up_y_min = it->y;
 		}
 	    }
 	  
-	  printf ( "center_x_max: %f, center_x_min: %f\nbottom_max: %f, bottom_min: %f\n up_max: %f, up_min: %f\nheight_max: %f, height_min: %f\n", center_x_max, center_x_min, bottom_max, bottom_min, up_max, up_min, height_max, height_min );
+	  printf ( "x_max: %f, x_min: %f\nbottom_y_max: %f, bottom_y_min: %f\n up_y_max: %f, up_y_min: %f\nz_max: %f, z_min: %f\n", obj_data.x_max, obj_data.x_min, obj_data.bottom_y_max, obj_data.bottom_y_min, obj_data.up_y_max, obj_data.up_y_min, obj_data.z_max, obj_data.z_min );
 	  
 	  transformed_data->header.frame_id = "camera_link";
 	  pcl::toROSMsg ( *transformed_data, *transformed_output );
-	  pub_pcl_trans.publish ( *transformed_output );
-	  
+	  pub_pcl_trans.publish ( *transformed_output );	  
 	}
-      /*
-	geometry_msgs::Point& obj_data_max = temp.back ();
-	geometry_msgs::Point& obj_data_min = temp.front ();
-	double obj_data_middle1 = ( obj_data_max.z - obj_data_min.z ) / 3.0;
-	double obj_data_middle2 = obj_data_middle1 * 2.0;
-	for ( auto its = temp.begin () ; its != temp.end () ; ++its )
-	{
-	if ( ( obj_data_middle1 > its->z ) || ( obj_data_middle2 < its->z ) )
-	{
-	obj_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
-		}
-	    }
-	  
-	  
-	  object_recognition_msgs::TableArray::ConstPtr table_array = ros::topic::waitForMessage <object_recognition_msgs::TableArray>( "table_array", nh, ros::Duration ( 2.0 ) );
-	  if ( !table_array )
-	    {
-	      ROS_INFO ( "No Table Array" );
-	    }
-	  else
-	    {
-	      geometry_msgs::Pose table_pose = table_array->tables[ 0 ].pose;
-	      float theta = M_PI / 2;
-	      Eigen::Affine3f transform = Eigen::Affine3f::Identity ();
-	      transform.translation () << 0.0, 0.0, 0.0;
-	      transform.rotate ( Eigen::AngleAxisf ( theta, Eigen::Vector3f::UnitY () ) );
-	      pcl::transformPointCloud ( *obj_sorted_data, *transformed_data, transform );
-	      transformed_data->header.frame_id = "camera_link";
-	      pcl::toROSMsg ( *transformed_data, *transformed_output );
-	      pub_pcl_trans.publish ( *transformed_output );
-	    }
-	  */      
-      
-      //obj_sorted_data->header.frame_id = "camera_link";
-      //sensor_msgs::PointCloud2::Ptr output ( new sensor_msgs::PointCloud2 );
-      //pcl::toROSMsg ( *obj_sorted_data, *output );
-      //pub_pcl_obj.publish ( *output );
-
     }
     
   };

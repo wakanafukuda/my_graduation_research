@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<launch>
+  <!-- <include file="$(find akira_recog_obj)/launch/r200_nodelet_rgbd.launch" /> -->
+
+  <node pkg="object_recognition_core" type="detection" name="detection" args="$(find object_recognition_tabletop)/conf/detection.table.ros.ork" />
+  
+  <node pkg="akira_recog_obj" type="akira_estimating_objects" name="akira_estimating_objects" />
+</launch>
