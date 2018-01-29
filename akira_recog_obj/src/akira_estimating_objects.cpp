@@ -24,7 +24,8 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-//#include <array>
+#include <string>
+#include <cmath>
 //*** for c++ stl ***
 
 //*** for ros::topic class ***
@@ -36,29 +37,62 @@ namespace akira_recog_obj
   class object_data_set
   {
   public:
-    double bottom_y_max;
-    double bottom_y_min;
-    double up_y_max;
-    double up_y_min;
-    double x_max;
-    double x_min;
-    double z_max;
-    double z_min;
+    std::string name;
+    double bottom_y_max, bottom_y_min;
+    double bottom_diameter, bottom_radius;
+    double up_y_max, up_y_min;
+    double up_diameter, up_radius;
+    double x_max, x_min;
+    double depth;
+    double z_max, z_min;
+    double height;
+    double angle;
+    double bottom_center_x, bottom_center_y;
+    double up_center_x, up_center_y;
     std::size_t size;
     
     object_data_set ()
     {
-      bottom_y_max = -100;
-      bottom_y_min = 100;
-      up_y_max = -100;
-      up_y_min = 100;
-      x_max = -100;
-      x_min = 100;
-      z_max = -100;
-      z_min = 100;
+      bottom_y_max = -100; bottom_y_min = 100; bottom_diameter = 0;
+      up_y_max = -100; up_y_min = 100; up_diameter = 0;
+      x_max = -100; x_min = 100; depth = 0;
+      z_max = -100; z_min = 100; height = 0;
+      angle = 0;
+      bottom_center_x = 0; bottom_center_y = 0;
+      up_center_x = 0; up_center_y = 0;
     }
 
     ~object_data_set () { }
+
+    void calc_parameters ()
+    {
+      bottom_diameter = ( std::abs ( bottom_y_max - bottom_y_min ) ) * 100;
+      bottom_radius = bottom_diameter / 2;
+      up_diameter = ( std::abs ( up_y_max - up_y_min ) ) * 100;
+      up_radius = up_diameter / 2;
+      depth = ( std::abs ( x_max - x_min ) ) * 100;
+      height = ( std::abs ( z_max - z_min ) ) * 100;
+      bottom_center_x = up_center_x = ( x_max + x_min ) / 2;
+      bottom_center_y = ( bottom_y_max + bottom_y_min ) / 2;
+      up_center_y = ( up_y_max + up_y_min ) / 2;
+      if ( std::abs ( bottom_diameter - up_diameter ) < 1.0 )
+	{
+	  name = "clinder";
+	  angle = 90;
+	}
+      else if ( ( bottom_diameter - up_diameter ) > 1.0 )
+	{
+	  name = "truncated_cone";
+	  angle = atan2 ( height, ( bottom_radius - up_radius ) );
+	  angle = angle * ( 180 / M_PI );
+	}
+      else if ( ( up_diameter - bottom_diameter ) > 1.0 )
+	{
+	  name = "reverse_truncated_cone";
+	  angle = atan2 ( height, ( up_radius - bottom_radius ) );
+	  angle = 180 - angle * ( 180 / M_PI );
+	}
+    }
   };
   
   class estObjClass
@@ -68,7 +102,6 @@ namespace akira_recog_obj
     ros::Subscriber sub_obj_ary;
     ros::Publisher pub_obj_shape;
     ros::Publisher pub_obj_line;
-    ros::Publisher pub_pcl_obj;
     ros::Publisher pub_pcl_trans;
   
     estObjClass ()
@@ -77,7 +110,6 @@ namespace akira_recog_obj
       sub_obj_ary = nh.subscribe ( "/tabletop/clusters", 1, &estObjClass::estObjCb, this );
       pub_obj_shape = nh.advertise <std_msgs::String> ( "object_shape", 1 );
       pub_obj_line = nh.advertise <visualization_msgs::Marker> ( "object_line", 1 );
-      pub_pcl_obj = nh.advertise <sensor_msgs::PointCloud2> ( "object_pcl", 1 );
       pub_pcl_trans = nh.advertise <sensor_msgs::PointCloud2> ( "trans_pcl", 1 );
     }
     ~estObjClass ()
@@ -87,7 +119,6 @@ namespace akira_recog_obj
 
     void estObjCb ( const visualization_msgs::MarkerArray::Ptr& input_data )
     {
-      //pcl::PointCloud<pcl::PointXYZ>::Ptr obj_data ( new pcl::PointCloud<pcl::PointXYZ> () );
       pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_data ( new pcl::PointCloud<pcl::PointXYZ> () );
       sensor_msgs::PointCloud2::Ptr transformed_output ( new sensor_msgs::PointCloud2 );
       std::vector<geometry_msgs::Point> temp;
@@ -120,8 +151,6 @@ namespace akira_recog_obj
 	  object_data_set obj_data;
 	  obj_data.size = temp.size ();
 	  std::cout << "size: " << obj_data.size << std::endl;
-	  //std::size_t obj_data_size = temp.size ();
-	  //std::cout << "size: " << obj_data_size << std::endl;
 	  std::vector<geometry_msgs::Point>( ).swap ( temp );
 	  
 	  //geometry_msgs::Pose table_pose = table_array->tables[ 0 ].pose;
@@ -131,27 +160,8 @@ namespace akira_recog_obj
 	  transform.rotate ( Eigen::AngleAxisf ( theta_z, Eigen::Vector3f::UnitZ() ) );
 	  pcl::transformPointCloud ( *obj_sorted_data, *transformed_data, transform );
 
-	  double bottom_max = -100;
-	  double bottom_min = 100;
-	  double up_max = -100;
-	  double up_min = 100;
-	  double center_x_max = -100;
-	  double center_x_min = 100;
-	  double height_max = -100;
-	  double height_min = 100;
 	  for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = transformed_data->begin () ; it != transformed_data->end () ; ++it )
 	    {
-	      /*
-	      if ( it->x > center_x_max )
-		center_x_max = it->x;
-	      else if ( it->x < center_x_min )
-		center_x_min = it->x;
-	      
-	      if ( it->z > height_max )
-		height_max = it->z;
-	      else if ( it->z < height_min )
-		height_min = it->z;
-	      */
 	      if ( it->x > obj_data.x_max )
 		obj_data.x_max = it->x;
 	      else if ( it->x < obj_data.x_min )
@@ -165,22 +175,6 @@ namespace akira_recog_obj
 	  
 	  for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = transformed_data->begin () ; it != transformed_data->end () ; ++it )
 	    {
-	      /*
-	      if ( it->z < ( height_min + 0.02 ) )
-		{
-		  if ( it->y > bottom_max )
-		    bottom_max = it->y;
-		  else if ( it->y < bottom_min )
-		    bottom_min = it->y;
-		}
-	      else if ( it->z > ( height_max - 0.02 ) )
-		{
-		  if ( it->y > up_max )
-		    up_max = it->y;
-		  else if ( it->y < up_min )
-		    up_min = it->y;
-		}
-	      */
 	      if ( it->z < ( obj_data.z_min + 0.02 ) )
 		{
 		  if ( it->y > obj_data.bottom_y_max )
@@ -196,8 +190,17 @@ namespace akira_recog_obj
 		    obj_data.up_y_min = it->y;
 		}
 	    }
-	  
-	  printf ( "x_max: %f, x_min: %f\nbottom_y_max: %f, bottom_y_min: %f\n up_y_max: %f, up_y_min: %f\nz_max: %f, z_min: %f\n", obj_data.x_max, obj_data.x_min, obj_data.bottom_y_max, obj_data.bottom_y_min, obj_data.up_y_max, obj_data.up_y_min, obj_data.z_max, obj_data.z_min );
+
+	  obj_data.calc_parameters ();
+	  std::cout << "bottom_diameter: " << obj_data.bottom_diameter << ", up_diameter: " << obj_data.up_diameter << std::endl;
+	  std::cout << "depth: " << obj_data.depth << ", height: " << obj_data.height << std::endl;
+	  if ( obj_data.name.length () > 0 )
+	    {
+	      //std_msgs::String obj_name;
+	      //obj_name.data = obj_data.name;
+	      //pub_obj_shape.publish ( obj_name );
+	      std::cout << "name: " << obj_data.name << ", angle: " << obj_data.angle << std::endl;
+	    }
 	  
 	  transformed_data->header.frame_id = "camera_link";
 	  pcl::toROSMsg ( *transformed_data, *transformed_output );
