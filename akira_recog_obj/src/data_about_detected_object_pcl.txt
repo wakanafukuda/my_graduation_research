@@ -1,0 +1,302 @@
+size: 8594
+max_z: 0.846672min_z: 0.773
+size: 9178
+max_z: 0.846672min_z: 0.559125
+size: 8378
+max_z: 0.843641min_z: 0.771984
+size: 9128
+max_z: 0.843641min_z: 0.553125
+size: 8398
+max_z: 0.84025min_z: 0.773047
+size: 8826
+max_z: 0.84025min_z: 0.557
+size: 8635
+max_z: 0.843031min_z: 0.770203
+size: 9020
+max_z: 0.843031min_z: 0.558141
+size: 8429
+max_z: 0.843469min_z: 0.77075
+size: 9148
+max_z: 0.843469min_z: 0.555125
+size: 9522
+max_z: 0.843469min_z: 0.552016
+size: 8550
+max_z: 0.848203min_z: 0.773125
+size: 9028
+max_z: 0.848203min_z: 0.558
+size: 9822
+max_z: 0.848203min_z: 0.551
+size: 8505
+max_z: 0.840875min_z: 0.76925
+size: 9195
+max_z: 0.840875min_z: 0.556
+size: 8477
+max_z: 0.84325min_z: 0.777
+size: 9049
+max_z: 0.84325min_z: 0.557
+size: 8555
+max_z: 0.84275min_z: 0.773375
+size: 8955
+max_z: 0.84275min_z: 0.558766
+size: 8101
+max_z: 0.841078min_z: 0.771359
+size: 8883
+max_z: 0.841078min_z: 0.554375
+size: 8493
+max_z: 0.84min_z: 0.770375
+size: 8951
+max_z: 0.84min_z: 0.558
+size: 9560
+max_z: 0.84min_z: 0.55
+size: 8479
+max_z: 0.841125min_z: 0.771906
+size: 9034
+max_z: 0.841125min_z: 0.557672
+size: 8019
+max_z: 0.8435min_z: 0.772016
+size: 8542
+max_z: 0.8435min_z: 0.552
+size: 9030
+max_z: 0.8435min_z: 0.551
+size: 9041
+max_z: 0.841125min_z: 0.775
+size: 9748
+max_z: 0.841125min_z: 0.557609
+size: 10076
+max_z: 0.841125min_z: 0.55125
+size: 9345
+max_z: 0.844703min_z: 0.773078
+size: 10028
+max_z: 0.844703min_z: 0.554125
+size: 9088
+max_z: 0.843984min_z: 0.769453
+size: 10351
+max_z: 0.843984min_z: 0.552
+size: 8737
+max_z: 0.84675min_z: 0.7695
+size: 9292
+max_z: 0.84675min_z: 0.558234
+size: 9646
+max_z: 0.84675min_z: 0.552
+size: 9121
+max_z: 0.841min_z: 0.764
+size: 9862
+max_z: 0.841min_z: 0.553
+size: 10461
+max_z: 0.841min_z: 0.549047
+size: 9112
+max_z: 0.843672min_z: 0.769984
+size: 10188
+max_z: 0.843672min_z: 0.552
+size: 10778
+max_z: 0.843672min_z: 0.550125
+size: 9171
+max_z: 0.8395min_z: 0.76825
+size: 9835
+max_z: 0.8395min_z: 0.553859
+size: 10460
+max_z: 0.8395min_z: 0.550125
+size: 9486
+max_z: 0.842297min_z: 0.765359
+size: 10292
+max_z: 0.842297min_z: 0.55475
+size: 10857
+max_z: 0.842297min_z: 0.549766
+size: 9255
+max_z: 0.841min_z: 0.76825
+size: 10749
+max_z: 0.841min_z: 0.550125
+size: 11158
+max_z: 0.841min_z: 0.548125
+size: 9589
+max_z: 0.840359min_z: 0.768266
+size: 11388
+max_z: 0.840359min_z: 0.549125
+size: 11741
+max_z: 0.840359min_z: 0.549125
+size: 9295
+max_z: 0.843328min_z: 0.768125
+size: 10377
+max_z: 0.843328min_z: 0.552359
+size: 10782
+max_z: 0.843328min_z: 0.551125
+size: 2450
+max_z: 0.578125min_z: 0.557016
+size: 3359
+max_z: 0.836953min_z: 0.557016
+size: 9474
+max_z: 0.850109min_z: 0.765375
+size: 10702
+max_z: 0.850109min_z: 0.560375
+size: 11517
+max_z: 0.850109min_z: 0.560375
+size: 9270
+max_z: 0.848719min_z: 0.764078
+size: 10413
+max_z: 0.848719min_z: 0.561141
+size: 10857
+max_z: 0.848719min_z: 0.561141
+size: 9126
+max_z: 0.839min_z: 0.763375
+size: 10265
+max_z: 0.839min_z: 0.56625
+size: 11374
+max_z: 0.839min_z: 0.560453
+size: 9416
+max_z: 0.839547min_z: 0.760234
+size: 10639
+max_z: 0.839547min_z: 0.562234
+size: 11217
+max_z: 0.839547min_z: 0.561
+size: 9044
+max_z: 0.834891min_z: 0.758
+size: 9387
+max_z: 0.834891min_z: 0.565375
+size: 9926
+max_z: 0.834891min_z: 0.565375
+size: 10290
+max_z: 0.834891min_z: 0.561
+size: 11318
+max_z: 0.834891min_z: 0.56025
+size: 9153
+max_z: 0.838625min_z: 0.764625
+size: 11547
+max_z: 0.838625min_z: 0.561125
+size: 11870
+max_z: 0.838625min_z: 0.561125
+size: 8273
+max_z: 0.835min_z: 0.763
+size: 9388
+max_z: 0.835min_z: 0.562047
+size: 9992
+max_z: 0.835min_z: 0.560141
+size: 8654
+max_z: 0.83825min_z: 0.76425
+size: 9431
+max_z: 0.83825min_z: 0.565
+size: 10006
+max_z: 0.83825min_z: 0.559234
+size: 10355
+max_z: 0.83825min_z: 0.559
+size: 7683
+max_z: 0.840859min_z: 0.760469
+size: 8531
+max_z: 0.840859min_z: 0.563125
+size: 9105
+max_z: 0.840859min_z: 0.563125
+size: 8342
+max_z: 0.83525min_z: 0.762
+size: 9171
+max_z: 0.83525min_z: 0.56225
+size: 9779
+max_z: 0.83525min_z: 0.559078
+size: 7789
+max_z: 0.83575min_z: 0.760578
+size: 10008
+max_z: 0.83575min_z: 0.557125
+size: 10676
+max_z: 0.83575min_z: 0.557125
+size: 8368
+max_z: 0.837875min_z: 0.757734
+size: 9548
+max_z: 0.837875min_z: 0.56
+size: 10143
+max_z: 0.837875min_z: 0.56
+size: 8150
+max_z: 0.835203min_z: 0.76
+size: 9392
+max_z: 0.835203min_z: 0.56
+size: 10312
+max_z: 0.835203min_z: 0.559
+size: 8428
+max_z: 0.836min_z: 0.760203
+size: 9774
+max_z: 0.836min_z: 0.5595
+size: 10890
+max_z: 0.836min_z: 0.559
+size: 8128
+max_z: 0.839953min_z: 0.759125
+size: 9200
+max_z: 0.839953min_z: 0.558266
+size: 9994
+max_z: 0.839953min_z: 0.558266
+size: 8167
+max_z: 0.836172min_z: 0.759
+size: 9409
+max_z: 0.836172min_z: 0.56
+size: 10181
+max_z: 0.836172min_z: 0.559125
+size: 8339
+max_z: 0.835047min_z: 0.758672
+size: 10443
+max_z: 0.835047min_z: 0.559
+size: 11278
+max_z: 0.835047min_z: 0.559
+size: 7895
+max_z: 0.83775min_z: 0.760078
+size: 9559
+max_z: 0.83775min_z: 0.560375
+size: 10635
+max_z: 0.83775min_z: 0.557453
+size: 8825
+max_z: 0.835375min_z: 0.7565
+size: 9256
+max_z: 0.835375min_z: 0.564375
+size: 9877
+max_z: 0.835375min_z: 0.559
+size: 10880
+max_z: 0.835375min_z: 0.559
+size: 8403
+max_z: 0.837703min_z: 0.759078
+size: 9372
+max_z: 0.837703min_z: 0.560609
+size: 9834
+max_z: 0.837703min_z: 0.560125
+size: 8375
+max_z: 0.837min_z: 0.763
+size: 8723
+max_z: 0.837min_z: 0.569
+size: 9164
+max_z: 0.837min_z: 0.5615
+size: 10129
+max_z: 0.837min_z: 0.559
+size: 7485
+max_z: 0.84025min_z: 0.75425
+size: 8166
+max_z: 0.84025min_z: 0.560375
+size: 9042
+max_z: 0.84025min_z: 0.559453
+size: 9018
+max_z: 0.839875min_z: 0.756
+size: 10990
+max_z: 0.839875min_z: 0.557078
+size: 11386
+max_z: 0.839875min_z: 0.557078
+size: 12163
+max_z: 0.839875min_z: 0.557078
+size: 12834
+max_z: 0.839875min_z: 0.557078
+size: 8231
+max_z: 0.83875min_z: 0.75725
+size: 10523
+max_z: 0.83875min_z: 0.558672
+size: 11195
+max_z: 0.83875min_z: 0.558672
+size: 9115
+max_z: 0.835min_z: 0.759
+size: 11358
+max_z: 0.835min_z: 0.559125
+size: 12394
+max_z: 0.835min_z: 0.557234
+size: 9011
+max_z: 0.835641min_z: 0.755266
+size: 10182
+max_z: 0.835641min_z: 0.559
+size: 10909
+max_z: 0.835641min_z: 0.559
+size: 9966
+max_z: 0.841547min_z: 0.764
+size: 11191
+max_z: 0.841547min_z: 0.561
+^Csize: 12075
+max_z: 0.841547min_z: 0.559

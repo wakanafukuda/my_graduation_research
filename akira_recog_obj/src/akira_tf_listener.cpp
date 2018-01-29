@@ -1,13 +1,18 @@
 #include <ros/ros.h>
-#include <sensor_msgs/point_cloud_conversion.h>
+//#include <sensor_msgs/point_cloud_conversion.h>
 #include <tf/transform_listener.h>
 #include <tf/time_cache.h>
-#include <pcl_ros/point_cloud.h>
-#include <pcl/point_types.h>
-#include <sensor_msgs/point_cloud_conversion.h>
+//#include <pcl_ros/point_cloud.h>
+//#include <pcl/point_types.h>
+//#include <sensor_msgs/point_cloud_conversion.h>
 
-#include <sensor_msgs/PointCloud.h>
-#include <sensor_msgs/PointCloud2.h>
+//#include <sensor_msgs/PointCloud.h>
+//#include <sensor_msgs/PointCloud2.h>
+#include <object_recognition_msgs/TableArray.h>
+#include <visualization_msgs/MarkerArray.h>
+#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseStamped.h>
+
 
 class frameTransformListener
 {
@@ -51,7 +56,40 @@ public:
       }
   }
 };
+
+/*
+namespace akira_recog_obj
+{
+  class frameTransformListener
+  {
+  public:
+    ros::NodeHandle nh;
+    ros::Puslisher pub_obj_marker;
+    ros::Subscriber sub_table_array;
+
+    tf::TransformListener listener_camera_to_table;
     
+    frameTransformListener ()
+    {
+      pub_obj_marker = nh.advertise <visualization_msgs::MarkerArray> ( "akira/tabletop/clusters", 1 );
+      sub = nh.subscribe ( "/tabletop/clusters", 1, &frameTransformListener::callback, this );
+    }
+
+    ~frameTransformListener () { }
+
+    void callback ( const visualization_msgs::MarkerArray::Ptr& input_data )
+    {
+      geometry_msgs::PoseStamped::Ptr input_pose ( new geometry_msgs::PoseStamped );
+      geometry_msgs::PoseStamped::Ptr temp_pose1 ( new geometry_msgs::PoseStamped );
+      geometry_msgs::PoseStamped::Ptr temp_pose2 ( new geometry_msgs::PoseStamped );
+      try
+	{
+	  listener_camera_to_table.waitForTransform ( "camera_rgb_optical_frame", "camera_link", now, ros::Duration ( 3.0 ) );
+	  listener_camera_to_table.transformPose
+      
+      
+*/
+
 int main ( int argc, char** argv )
 {
   ros::init ( argc, argv, "akira_tf_listener" );

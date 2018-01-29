@@ -99,8 +99,8 @@ add_library(akira_recog_obj src/akira_recog_obj.cpp)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(akira_tf_broadcaster src/akira_tf_broadcaster.cpp)
-add_executable(akira_tf_listener src/akira_tf_listener.cpp)
+# add_executable(akira_tf_broadcaster src/akira_tf_broadcaster.cpp)
+# add_executable(akira_tf_listener src/akira_tf_listener.cpp)
 add_executable(akira_estimating_objects src/akira_estimating_objects.cpp)
 
 ## Rename C++ executable without prefix
@@ -117,8 +117,8 @@ add_executable(akira_estimating_objects src/akira_estimating_objects.cpp)
 ## target_link_libraries(akira_detect_table ${catkin_LIBRARIES})
 ## target_link_libraries(akira_clustering_clouds ${catkin_LIBRARIES})
 target_link_libraries(akira_recog_obj ${catkin_LIBRARIES})
-target_link_libraries(akira_tf_broadcaster ${catkin_LIBRARIES})
-target_link_libraries(akira_tf_listener ${catkin_LIBRARIES})
+# target_link_libraries(akira_tf_broadcaster ${catkin_LIBRARIES})
+# target_link_libraries(akira_tf_listener ${catkin_LIBRARIES})
 target_link_libraries(akira_estimating_objects ${catkin_LIBRARIES})
 
 if(catkin_EXPORTED_LIBRARIES)

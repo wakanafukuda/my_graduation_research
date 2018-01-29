@@ -21,7 +21,7 @@
 //*** for affine transform ***
 
 //*** for c++ stl ***
-//#include <sstream>
+#include <iostream>
 #include <algorithm>
 #include <vector>
 //#include <array>
@@ -59,58 +59,110 @@ namespace akira_recog_obj
 
     void estObjCb ( const visualization_msgs::MarkerArray::Ptr& input_data )
     {
-      /*
-      std_msgs::String msg;
-      std::stringstream ss;
-      ss << input_data->markers[ 0 ].header.frame_id;
-      msg.data = ss.str ();
-      ROS_INFO ( "%s", msg.data.c_str () );
-
-      for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
-	{
-	  ROS_INFO ( "%f %f %f", it->points[ 0 ].x, it->points[ 0 ].y, it->points[ 0 ].z );
-	}
-      */
-      
-      //object_recognition_msgs::TableArray::ConstPtr table_array = ros::topic::waitForMessage <object_recognition_msgs::TableArray>( "table_array", nh, ros::Duration ( 2.0 ) );
-      //object_recognition_msgs::TableArray::ConstPtr table_array ( new object_recognition_msgs::TableArray );
-      //table_array = ros::topic::waitForMessage <object_recognition_msgs::TableArray> ( "table_array", nh, ros::Duration ( 2.0 ) );
-      pcl::PointCloud<pcl::PointXYZ>::Ptr obj_sorted_data ( new pcl::PointCloud<pcl::PointXYZ> () );
-      pcl::PointCloud<pcl::PointXYZ>::Ptr obj_data ( new pcl::PointCloud<pcl::PointXYZ> () );
+      //pcl::PointCloud<pcl::PointXYZ>::Ptr obj_data ( new pcl::PointCloud<pcl::PointXYZ> () );
       pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_data ( new pcl::PointCloud<pcl::PointXYZ> () );
       sensor_msgs::PointCloud2::Ptr transformed_output ( new sensor_msgs::PointCloud2 );
       std::vector<geometry_msgs::Point> temp;
 
-      for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
+      object_recognition_msgs::TableArray::ConstPtr table_array = ros::topic::waitForMessage <object_recognition_msgs::TableArray>( "table_array", nh, ros::Duration ( 2.0 ) );
+      if ( !table_array )
 	{
-
-	  for ( auto its = std::begin ( it->points ) ; its != std::end ( it->points ) ; ++its )
+	  ROS_INFO ( "No Table Array" );
+	}
+      else
+	{     
+	  pcl::PointCloud<pcl::PointXYZ>::Ptr obj_sorted_data ( new pcl::PointCloud<pcl::PointXYZ> () );
+	  for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
 	    {
-	      geometry_msgs::Point temp_point;
-	      temp_point.x = its->x;
-	      temp_point.y = its->y;
-	      temp_point.z = its->z;
-	      temp.push_back ( temp_point );
+	      for ( auto its = std::begin ( it->points ) ; its != std::end ( it->points ) ; ++its )
+		{
+		  geometry_msgs::Point temp_point;
+		  temp_point.x = its->x;
+		  temp_point.y = its->y;
+		  temp_point.z = its->z;
+		  temp.push_back ( temp_point );
+		}
 	    }
-	  std::sort ( temp.begin (), temp.end (), [] ( const geometry_msgs::Point& a, const geometry_msgs::Point& b ) { return a.z < b.z; } );
-	  
+	  //std::sort ( temp.begin (), temp.end (), [] ( const geometry_msgs::Point& a, const geometry_msgs::Point& b ) { return a.z < b.z; } );// from min to max	  
 	  for ( auto its = temp.begin () ; its != temp.end () ; ++its )
 	    {
 	      obj_sorted_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
 	    }
-	  /*	  
-	  geometry_msgs::Point& obj_data_max = temp.back ();
-	  geometry_msgs::Point& obj_data_min = temp.front ();
-	  double obj_data_middle1 = ( obj_data_max.z - obj_data_min.z ) / 3.0;
-	  double obj_data_middle2 = obj_data_middle1 * 2.0;
-	  for ( auto its = temp.begin () ; its != temp.end () ; ++its )
+	  
+	  std::size_t obj_data_size = temp.size ();
+	  std::cout << "size: " << obj_data_size << std::endl;
+	  
+	  geometry_msgs::Pose table_pose = table_array->tables[ 0 ].pose;
+	  float theta_x = M_PI /2, theta_y = M_PI / 2, theta_z = - ( M_PI / 2 );
+	  Eigen::Affine3f transform = Eigen::Affine3f::Identity ();
+	  //transform.rotate ( Eigen::AngleAxisf ( theta_x, Eigen::Vector3f::UnitX () ) );
+	  transform.rotate ( Eigen::AngleAxisf ( theta_y, Eigen::Vector3f::UnitY () ) );
+	  //transform.translation () << -table_pose.position.x, -table_pose.position.y, -table_pose.position.z;
+	  transform.rotate ( Eigen::AngleAxisf ( theta_z, Eigen::Vector3f::UnitZ() ) );
+	  pcl::transformPointCloud ( *obj_sorted_data, *transformed_data, transform );
+
+	  std::size_t data_counter = 0;
+	  double bottom_max = -100;
+	  double bottom_min = 100;
+	  double up_max = -100;
+	  double up_min = 100;
+	  double center_x_max = -100;
+	  double center_x_min = 100;
+	  for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = transformed_data->begin () ; it != transformed_data->end () ; ++it )
 	    {
-	      if ( ( obj_data_middle1 > its->z ) || ( obj_data_middle2 < its->z ) )
+	      if ( data_counter < 500 )
 		{
-		  obj_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
+		  if ( it->y > bottom_max )
+		    {
+		      bottom_max = it->y;
+		    }
+		  else if ( it->y < bottom_min )
+		    {
+		      bottom_min = it->y;
+		    }
+		}
+	      else if ( data_counter < obj_data_size - 500 )
+		{
+		  if ( it->y > up_max )
+		    {
+		      up_max = it->y;
+		    }
+		  else if ( it->y < up_min )
+		    {
+		      up_min = it->y;
+		    }
+		}
+	      if ( it->x > center_x_max )
+		{
+		  center_x_max = it->x;
+		}
+	      else if ( it->x < center_x_min )
+		{
+		  center_x_min = it->x;
+		}
+	      ++data_counter;
+	    }
+	  printf ( "center_x_max: %f, center_x_min: %f\nbottom_max: %f, bottom_min: %f, up_max: %f, up_min: %f", center_x_max, center_x_min, bottom_max, bottom_min, up_max, up_min );
+	  
+	  transformed_data->header.frame_id = "camera_link";
+	  pcl::toROSMsg ( *transformed_data, *transformed_output );
+	  pub_pcl_trans.publish ( *transformed_output );
+	  
+	}
+      std::vector<geometry_msgs::Point>( ).swap ( temp );
+      /*
+	geometry_msgs::Point& obj_data_max = temp.back ();
+	geometry_msgs::Point& obj_data_min = temp.front ();
+	double obj_data_middle1 = ( obj_data_max.z - obj_data_min.z ) / 3.0;
+	double obj_data_middle2 = obj_data_middle1 * 2.0;
+	for ( auto its = temp.begin () ; its != temp.end () ; ++its )
+	{
+	if ( ( obj_data_middle1 > its->z ) || ( obj_data_middle2 < its->z ) )
+	{
+	obj_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
 		}
 	    }
-	  */
+	  
 	  
 	  object_recognition_msgs::TableArray::ConstPtr table_array = ros::topic::waitForMessage <object_recognition_msgs::TableArray>( "table_array", nh, ros::Duration ( 2.0 ) );
 	  if ( !table_array )
@@ -129,17 +181,15 @@ namespace akira_recog_obj
 	      pcl::toROSMsg ( *transformed_data, *transformed_output );
 	      pub_pcl_trans.publish ( *transformed_output );
 	    }
-	}      
+	  */      
       
-      obj_sorted_data->header.frame_id = "camera_link";
-      sensor_msgs::PointCloud2::Ptr output ( new sensor_msgs::PointCloud2 );
-      pcl::toROSMsg ( *obj_sorted_data, *output );
-      pub_pcl_obj.publish ( *output );
+      //obj_sorted_data->header.frame_id = "camera_link";
+      //sensor_msgs::PointCloud2::Ptr output ( new sensor_msgs::PointCloud2 );
+      //pcl::toROSMsg ( *obj_sorted_data, *output );
+      //pub_pcl_obj.publish ( *output );
 
-      std::vector<geometry_msgs::Point>( ).swap ( temp );
-      //delete obj_data;
-      //delete output;
     }
+    
   };
 }
 
