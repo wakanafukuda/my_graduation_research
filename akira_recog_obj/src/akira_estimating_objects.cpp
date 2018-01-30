@@ -32,6 +32,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <fstream>
 //*** for c++ stl ***
 
 //*** for ros::topic class ***
@@ -215,24 +216,34 @@ int main ( int argc, char** argv )
 {
   ros::init ( argc, argv, "akira_estimating_objects" );
 
-  std::string dir_name( "../data/" );
+  std::string dir_name( "/home/wakana/catkin_ws/src/my_graduation_research/akira_recog_obj/data/" );
   const char* dir_name_ptr = dir_name.c_str ();
   for ( int i = 1 ; ; ++i )
     {
       dir_name = dir_name + ( std::to_string ( i ) );
       struct stat buf;
       if ( ( stat ( dir_name_ptr, &buf ) ) == 0 )
-	std::cout << "directory " << dir_name << " exists." << std::endl;
+	{
+	  std::cout << "Directory " << dir_name << " exists." << std::endl;
+	  for ( std::string::reverse_iterator rit = dir_name.rbegin () ; rit != dir_name.rend () ; ++rit )
+	    {
+	      if ( *rit == "/" )
+		break;
+	      else
+		dir_name.pop_back ();
+	    }
+	}
       else
 	{
-	  if ( ( mkdir ( dir_name_ptr, 0755 ) ) == 0 )
+	  std::cout << "Directory " << dir_name << " doesn't exits. This program will make it." << std::endl;
+	  if ( ( mkdir ( dir_name_ptr, 0777 ) ) == 0 )
 	    {
-	      std::cout << "directory " << dir_name << " was made." << std::endl;
+	      std::cout << "Directory " << dir_name << " was made." << std::endl;
 	      break;
 	    }
 	  else
 	    {
-	      std::cout << "directory " << dir_name << " couldn't be made. This program will shutdown." << std::endl;
+	      std::cout << "Directory " << dir_name << " couldn't be made. This program will shutdown." << std::endl;
 	      exit ( 1 );
 	    }
 	}
