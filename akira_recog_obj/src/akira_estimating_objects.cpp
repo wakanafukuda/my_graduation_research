@@ -1,4 +1,10 @@
 #include <ros/ros.h>
+#include <stdlib.h>
+
+//*** for mkdir ***
+#include <sys/stat.h>
+#include <sys/types.h>
+//*** for mkdir ***
 
 //*** for messageType ***
 #include <std_msgs/String.h>
@@ -100,16 +106,14 @@ namespace akira_recog_obj
   public:
     ros::NodeHandle nh;
     ros::Subscriber sub_obj_ary;
-    ros::Publisher pub_obj_shape;
-    ros::Publisher pub_obj_line;
+    //ros::Publisher pub_obj_line;
     ros::Publisher pub_pcl_trans;
   
     estObjClass ()
     {
       ROS_INFO ( "akira estimating objects node start." );
       sub_obj_ary = nh.subscribe ( "/tabletop/clusters", 1, &estObjClass::estObjCb, this );
-      pub_obj_shape = nh.advertise <std_msgs::String> ( "object_shape", 1 );
-      pub_obj_line = nh.advertise <visualization_msgs::Marker> ( "object_line", 1 );
+      //pub_obj_line = nh.advertise <visualization_msgs::Marker> ( "object_line", 1 );
       pub_pcl_trans = nh.advertise <sensor_msgs::PointCloud2> ( "trans_pcl", 1 );
     }
     ~estObjClass ()
@@ -142,7 +146,6 @@ namespace akira_recog_obj
 		  temp.push_back ( temp_point );
 		}
 	    }
-	  //std::sort ( temp.begin (), temp.end (), [] ( const geometry_msgs::Point& a, const geometry_msgs::Point& b ) { return a.z < b.z; } );// from min to max	  
 	  for ( auto its = temp.begin () ; its != temp.end () ; ++its )
 	    {
 	      obj_sorted_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
@@ -196,9 +199,6 @@ namespace akira_recog_obj
 	  std::cout << "depth: " << obj_data.depth << ", height: " << obj_data.height << std::endl;
 	  if ( obj_data.name.length () > 0 )
 	    {
-	      //std_msgs::String obj_name;
-	      //obj_name.data = obj_data.name;
-	      //pub_obj_shape.publish ( obj_name );
 	      std::cout << "name: " << obj_data.name << ", angle: " << obj_data.angle << std::endl;
 	    }
 	  
@@ -214,6 +214,30 @@ namespace akira_recog_obj
 int main ( int argc, char** argv )
 {
   ros::init ( argc, argv, "akira_estimating_objects" );
+
+  std::string dir_name( "../data/" );
+  const char* dir_name_ptr = dir_name.c_str ();
+  for ( int i = 1 ; ; ++i )
+    {
+      dir_name = dir_name + ( std::to_string ( i ) );
+      struct stat buf;
+      if ( ( stat ( dir_name_ptr, &buf ) ) == 0 )
+	std::cout << "directory " << dir_name << " exists." << std::endl;
+      else
+	{
+	  if ( ( mkdir ( dir_name_ptr, 0755 ) ) == 0 )
+	    {
+	      std::cout << "directory " << dir_name << " was made." << std::endl;
+	      break;
+	    }
+	  else
+	    {
+	      std::cout << "directory " << dir_name << " couldn't be made. This program will shutdown." << std::endl;
+	      exit ( 1 );
+	    }
+	}
+    }
+	
   akira_recog_obj::estObjClass obj;
 
   ros::spin ();
