@@ -129,6 +129,8 @@ namespace akira_recog_obj
 	    ofs << angle << std::endl;
 	  else if ( filename == "/name.txt" )
 	    ofs << name << std::endl;
+	  else if ( filename == "/size.txt" )
+	    ofs << size << std::endl;
 	  else
 	    std::cout << "This program won't prepare such a file." << std::endl;	  
 	}
@@ -151,7 +153,8 @@ namespace akira_recog_obj
     std::string height_file;
     std::string angle_file;
     std::string obj_name_file;
-  
+    std::string size_file;
+    
     estObjClass ( std::string& temp_dir_name )
     {
       ROS_INFO ( "akira estimating objects node start." );
@@ -164,6 +167,7 @@ namespace akira_recog_obj
       height_file = "/height.txt";
       angle_file = "/angle.txt";
       obj_name_file = "/name.txt";
+      size_file = "/size.txt";
     }
     
     ~estObjClass ()
@@ -255,6 +259,7 @@ namespace akira_recog_obj
 	  obj_data.write_data ( dir_name, height_file );
 	  obj_data.write_data ( dir_name, angle_file );
 	  obj_data.write_data ( dir_name, obj_name_file );
+	  obj_data.write_data ( dir_name, size_file );
 	  
 	  transformed_data->header.frame_id = "camera_link";
 	  pcl::toROSMsg ( *transformed_data, *transformed_output );
