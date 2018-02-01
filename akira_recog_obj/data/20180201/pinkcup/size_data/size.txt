@@ -1,0 +1,6 @@
+bottom_diameter: 7.0cm
+up_diameter: 9.0cm
+up_depth: 9.0cm
+height: 11.3cm
+angle: 96degree
+name: reverse
