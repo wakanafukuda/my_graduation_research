@@ -60,6 +60,7 @@ namespace akira_recog_obj
     
     object_data_set ()
     {
+      name = "no_name";
       bottom_y_max = -100; bottom_y_min = 100; bottom_diameter = 0;
       up_y_max = -100; up_y_min = 100; up_diameter = 0;
       x_max = -100; x_min = 100; depth = 0;
@@ -82,24 +83,57 @@ namespace akira_recog_obj
       bottom_center_x = up_center_x = ( x_max + x_min ) / 2;
       bottom_center_y = ( bottom_y_max + bottom_y_min ) / 2;
       up_center_y = ( up_y_max + up_y_min ) / 2;
+
       if ( std::abs ( bottom_diameter - up_diameter ) < 1.0 )
 	{
+	  name.erase ( name.begin (), name.end () );
 	  name = "clinder";
 	  angle = 90;
 	}
       else if ( ( bottom_diameter - up_diameter ) > 1.0 )
 	{
+	  name.erase ( name.begin (), name.end () );
 	  name = "truncated_cone";
 	  angle = atan2 ( height, ( bottom_radius - up_radius ) );
 	  angle = angle * ( 180 / M_PI );
 	}
       else if ( ( up_diameter - bottom_diameter ) > 1.0 )
 	{
+	  name.erase ( name.begin (), name.end () );
 	  name = "reverse_truncated_cone";
 	  angle = atan2 ( height, ( up_radius - bottom_radius ) );
 	  angle = 180 - angle * ( 180 / M_PI );
 	}
     }
+    
+    void write_data ( std::string& dir_name, std::string& filename )
+    {
+      std::ofstream ofs;
+      ofs.open ( dir_name + filename, std::ios::app );
+      if ( !ofs )
+	{
+	  std::cout << "This program couldn't open " << filename << std::endl;
+	  exit ( 1 );
+	}
+      else
+	{
+	  if ( filename == "/bottom_diameter.txt" )
+	    ofs << bottom_diameter << std::endl;
+	  else if ( filename == "/up_diameter.txt" )
+	    ofs << up_diameter << std::endl;
+	  else if ( filename == "/depth.txt" )
+	    ofs << depth << std::endl;
+	  else if ( filename == "/height.txt" )
+	    ofs << height << std::endl;
+	  else if ( filename == "/angle.txt" )
+	    ofs << angle << std::endl;
+	  else if ( filename == "/name.txt" )
+	    ofs << name << std::endl;
+	  else
+	    std::cout << "This program won't prepare such a file." << std::endl;	  
+	}
+    }
+    
   };
   
   class estObjClass
@@ -107,16 +141,31 @@ namespace akira_recog_obj
   public:
     ros::NodeHandle nh;
     ros::Subscriber sub_obj_ary;
-    //ros::Publisher pub_obj_line;
     ros::Publisher pub_pcl_trans;
+    object_data_set obj_data;
+    
+    std::string dir_name;
+    std::string bottom_diameter_file;
+    std::string up_diameter_file;
+    std::string depth_file;
+    std::string height_file;
+    std::string angle_file;
+    std::string obj_name_file;
   
-    estObjClass ()
+    estObjClass ( std::string& temp_dir_name )
     {
       ROS_INFO ( "akira estimating objects node start." );
       sub_obj_ary = nh.subscribe ( "/tabletop/clusters", 1, &estObjClass::estObjCb, this );
-      //pub_obj_line = nh.advertise <visualization_msgs::Marker> ( "object_line", 1 );
       pub_pcl_trans = nh.advertise <sensor_msgs::PointCloud2> ( "trans_pcl", 1 );
+      dir_name = temp_dir_name;
+      bottom_diameter_file = "/bottom_diameter.txt";
+      up_diameter_file = "/up_diameter.txt";
+      depth_file = "/depth.txt";
+      height_file = "/height.txt";
+      angle_file = "/angle.txt";
+      obj_name_file = "/name.txt";
     }
+    
     ~estObjClass ()
     {
       ROS_INFO ( "akira estimating objects node stop." );
@@ -152,7 +201,7 @@ namespace akira_recog_obj
 	      obj_sorted_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
 	    }
 
-	  object_data_set obj_data;
+	  //object_data_set obj_data;
 	  obj_data.size = temp.size ();
 	  std::cout << "size: " << obj_data.size << std::endl;
 	  std::vector<geometry_msgs::Point>( ).swap ( temp );
@@ -199,16 +248,19 @@ namespace akira_recog_obj
 	  std::cout << "bottom_diameter: " << obj_data.bottom_diameter << ", up_diameter: " << obj_data.up_diameter << std::endl;
 	  std::cout << "depth: " << obj_data.depth << ", height: " << obj_data.height << std::endl;
 	  if ( obj_data.name.length () > 0 )
-	    {
-	      std::cout << "name: " << obj_data.name << ", angle: " << obj_data.angle << std::endl;
-	    }
+	    std::cout << "name: " << obj_data.name << ", angle: " << obj_data.angle << std::endl;
+	  obj_data.write_data ( dir_name, bottom_diameter_file );
+	  obj_data.write_data ( dir_name, up_diameter_file );
+	  obj_data.write_data ( dir_name, depth_file );
+	  obj_data.write_data ( dir_name, height_file );
+	  obj_data.write_data ( dir_name, angle_file );
+	  obj_data.write_data ( dir_name, obj_name_file );
 	  
 	  transformed_data->header.frame_id = "camera_link";
 	  pcl::toROSMsg ( *transformed_data, *transformed_output );
 	  pub_pcl_trans.publish ( *transformed_output );	  
 	}
-    }
-    
+    }    
   };
 }
 
@@ -216,7 +268,7 @@ int main ( int argc, char** argv )
 {
   ros::init ( argc, argv, "akira_estimating_objects" );
 
-  std::string dir_name( "/home/wakana/catkin_ws/src/my_graduation_research/akira_recog_obj/data/" );
+  std::string dir_name( "data" );
   const char* dir_name_ptr = dir_name.c_str ();
   for ( int i = 1 ; ; ++i )
     {
@@ -227,7 +279,7 @@ int main ( int argc, char** argv )
 	  std::cout << "Directory " << dir_name << " exists." << std::endl;
 	  for ( std::string::reverse_iterator rit = dir_name.rbegin () ; rit != dir_name.rend () ; ++rit )
 	    {
-	      if ( *rit == "/" )
+	      if ( *rit == 'a' )
 		break;
 	      else
 		dir_name.pop_back ();
@@ -236,7 +288,7 @@ int main ( int argc, char** argv )
       else
 	{
 	  std::cout << "Directory " << dir_name << " doesn't exits. This program will make it." << std::endl;
-	  if ( ( mkdir ( dir_name_ptr, 0777 ) ) == 0 )
+	  if ( ( mkdir ( dir_name_ptr, 0755 ) ) == 0 )
 	    {
 	      std::cout << "Directory " << dir_name << " was made." << std::endl;
 	      break;
@@ -249,7 +301,7 @@ int main ( int argc, char** argv )
 	}
     }
 	
-  akira_recog_obj::estObjClass obj;
+  akira_recog_obj::estObjClass obj ( dir_name );
 
   ros::spin ();
   return 0;
