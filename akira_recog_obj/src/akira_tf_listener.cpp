@@ -85,10 +85,8 @@ namespace akira_recog_obj
       ros::Time now = ros::Time::now ();
       pcl::PointCloud<pcl::PointXYZ>::Ptr input_obj_data ( new pcl::PointCloud<pcl::PointXYZ> () );
       std::vector<geometry_msgs::Point> temp;
-      std_msgs::Header input_data_header;
       for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
 	{
-	  input_data_header = it->header;
 	  for ( auto its = std::begin ( it->points ) ; its != std::end ( it->points ) ; ++its )
 	    {
 	      geometry_msgs::Point temp_point;
@@ -99,23 +97,31 @@ namespace akira_recog_obj
 	    }
 	}
       for ( auto it = temp.begin () ; it != temp.end () ; ++it )
-	input_obj_data->push_back ( pcl::PointXYZ ( it->x, it->z, it->z ) );
+	input_obj_data->push_back ( pcl::PointXYZ ( it->x, it->y, it->z ) );
       
       sensor_msgs::PointCloud2::Ptr temp_obj_pointcloud2 ( new sensor_msgs::PointCloud2 );
+      temp_obj_pointcloud2->header.frame_id = "camera_rgb_optical_frame";
       pcl::toROSMsg ( *input_obj_data, *temp_obj_pointcloud2 );
       sensor_msgs::PointCloud::Ptr temp_obj_pointcloud ( new sensor_msgs::PointCloud );
       sensor_msgs::convertPointCloud2ToPointCloud ( *temp_obj_pointcloud2, *temp_obj_pointcloud );
-      temp_obj_pointcloud->header = input_data_header;
+      temp_obj_pointcloud->header.frame_id = "camera_rgb_optical_frame";
       sensor_msgs::PointCloud2::Ptr transformed_clouds ( new sensor_msgs::PointCloud2 );
 
       try
 	{
+	  
 	  sensor_msgs::PointCloud::Ptr temp_transformed_pointcloud_num1 ( new sensor_msgs::PointCloud );
 	  sensor_msgs::PointCloud::Ptr temp_transformed_pointcloud_num2 ( new sensor_msgs::PointCloud );
-	  listener.waitForTransform ( temp_obj_pointcloud->header.frame_id, "camera_link", now, ros::Duration ( 3.0 ) );
-	  listener.transformPointCloud ( "camera_link", now, *temp_obj_pointcloud, temp_obj_pointcloud->header.frame_id, *temp_transformed_pointcloud_num1 );
+	  listener.waitForTransform ( "camera_rgb_optical_frame", "camera_link", now, ros::Duration ( 3.0 ) );
+	  listener.transformPointCloud ( "camera_link", now, *temp_obj_pointcloud, "camera_rgb_optical_frame", *temp_transformed_pointcloud_num1 );
 	  listener.waitForTransform ( "camera_link", "base_frame", now, ros::Duration ( 3.0 ) );
 	  listener.transformPointCloud ( "base_frame", now, *temp_transformed_pointcloud_num1, "camera_link", *temp_transformed_pointcloud_num2 );
+	  
+	  /*
+	  sensor_msgs::PointCloud::Ptr temp_transformed_pointcloud_num2 ( new sensor_msgs::PointCloud );
+	  listener.waitForTransform ( "camera_link", "base_frame", now, ros::Duration ( 3.0 ) );
+	  listener.transformPointCloud ( "base_frame", now, *temp_obj_pointcloud, "camera_link", *temp_transformed_pointcloud_num2 );
+	  */
 	  sensor_msgs::convertPointCloudToPointCloud2 ( *temp_transformed_pointcloud_num2, *transformed_clouds );
 	  pub_obj.publish ( *transformed_clouds );
 	}

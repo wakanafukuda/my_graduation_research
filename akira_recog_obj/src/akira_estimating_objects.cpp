@@ -60,6 +60,13 @@ namespace akira_recog_obj
     
     object_data_set ()
     {
+      init_data ();
+    }
+
+    ~object_data_set () { }
+
+    void init_data ()
+    {
       name = "no_name";
       bottom_y_max = -100; bottom_y_min = 100; bottom_diameter = 0;
       up_y_max = -100; up_y_min = 100; up_diameter = 0;
@@ -69,9 +76,6 @@ namespace akira_recog_obj
       bottom_center_x = 0; bottom_center_y = 0;
       up_center_x = 0; up_center_y = 0;
     }
-
-    ~object_data_set () { }
-
     void calc_parameters ()
     {
       bottom_diameter = ( std::abs ( bottom_y_max - bottom_y_min ) ) * 100;
@@ -305,6 +309,8 @@ namespace akira_recog_obj
 		obj_data.up_y_min = it->y;
 	    }
 	}
+      obj_data.size = obj_pointcloud->size ();
+      
       obj_data.calc_parameters ();
       std::cout << "bottom_diameter: " << obj_data.bottom_diameter << ", up_diameter: " << obj_data.up_diameter << std::endl;
       std::cout << "depth: " << obj_data.depth << ", height: " << obj_data.height << std::endl;
@@ -318,7 +324,7 @@ namespace akira_recog_obj
       obj_data.write_data ( dir_name, angle_file );
       obj_data.write_data ( dir_name, obj_name_file );
       obj_data.write_data ( dir_name, size_file );
-
+      obj_data.init_data ();
     }//testObjCb end
     
   };
