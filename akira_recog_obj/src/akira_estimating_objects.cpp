@@ -105,7 +105,7 @@ namespace akira_recog_obj
 	  angle = 180 - angle * ( 180 / M_PI );
 	}
     }
-    
+
     void write_data ( std::string& dir_name, std::string& filename )
     {
       std::ofstream ofs;
@@ -135,14 +135,15 @@ namespace akira_recog_obj
 	    std::cout << "This program won't prepare such a file." << std::endl;	  
 	}
     }
-    
+      
   };
   
   class estObjClass
   {
   public:
     ros::NodeHandle nh;
-    ros::Subscriber sub_obj_ary;
+    //ros::Subscriber sub_obj_ary;
+    ros::Subscriber sub_obj_test;
     ros::Publisher pub_pcl_trans;
     object_data_set obj_data;
     
@@ -158,7 +159,8 @@ namespace akira_recog_obj
     estObjClass ( std::string& temp_dir_name )
     {
       ROS_INFO ( "akira estimating objects node start." );
-      sub_obj_ary = nh.subscribe ( "/tabletop/clusters", 1, &estObjClass::estObjCb, this );
+      //sub_obj_ary = nh.subscribe ( "/tabletop/clusters", 1, &estObjClass::estObjCb, this );
+      sub_obj_test = nh.subscribe ( "/akira/tabletop/clusters", 1, &estObjClass::testObjCb, this );
       pub_pcl_trans = nh.advertise <sensor_msgs::PointCloud2> ( "trans_pcl", 1 );
       dir_name = temp_dir_name;
       bottom_diameter_file = "/bottom_diameter.txt";
@@ -265,7 +267,60 @@ namespace akira_recog_obj
 	  pcl::toROSMsg ( *transformed_data, *transformed_output );
 	  pub_pcl_trans.publish ( *transformed_output );	  
 	}
-    }    
+    }//estObjCb end
+
+    
+    void testObjCb ( const sensor_msgs::PointCloud2::ConstPtr& input_data )
+    {
+      pcl::PointCloud<pcl::PointXYZ>::Ptr obj_pointcloud ( new pcl::PointCloud<pcl::PointXYZ> );
+      pcl::fromROSMsg ( *input_data, *obj_pointcloud );
+
+      for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = obj_pointcloud->begin () ; it != obj_pointcloud->end () ; ++it )
+	{
+	  if ( it->x > obj_data.x_max )
+	    obj_data.x_max = it->x;
+	  else if ( it->x < obj_data.x_min )
+	    obj_data.x_min = it->x;
+	  
+	  if ( it->z > obj_data.z_max )
+	    obj_data.z_max = it->z;
+	  else if ( it->z < obj_data.z_min )
+	    obj_data.z_min = it->z;
+	}
+      
+      for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = obj_pointcloud->begin () ; it != obj_pointcloud->end () ; ++it )
+	{
+	  if ( it->z < ( obj_data.z_min + 0.02 ) )
+	    {
+	      if ( it->y > obj_data.bottom_y_max )
+		obj_data.bottom_y_max = it->y;
+	      else if ( it->y < obj_data.bottom_y_min )
+		obj_data.bottom_y_min = it->y;
+	    }
+	  else if ( it->z > ( obj_data.z_max - 0.02 ) )
+	    {
+	      if ( it->y > obj_data.up_y_max )
+		obj_data.up_y_max = it->y;
+	      else if ( it->y < obj_data.up_y_min )
+		obj_data.up_y_min = it->y;
+	    }
+	}
+      obj_data.calc_parameters ();
+      std::cout << "bottom_diameter: " << obj_data.bottom_diameter << ", up_diameter: " << obj_data.up_diameter << std::endl;
+      std::cout << "depth: " << obj_data.depth << ", height: " << obj_data.height << std::endl;
+      if ( obj_data.name.length () > 0 )
+	std::cout << "name: " << obj_data.name << ", angle: " << obj_data.angle << std::endl;
+
+      obj_data.write_data ( dir_name, bottom_diameter_file );
+      obj_data.write_data ( dir_name, up_diameter_file );
+      obj_data.write_data ( dir_name, depth_file );
+      obj_data.write_data ( dir_name, height_file );
+      obj_data.write_data ( dir_name, angle_file );
+      obj_data.write_data ( dir_name, obj_name_file );
+      obj_data.write_data ( dir_name, size_file );
+
+    }//testObjCb end
+    
   };
 }
 

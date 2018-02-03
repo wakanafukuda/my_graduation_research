@@ -1,19 +1,22 @@
 #include <ros/ros.h>
-//#include <sensor_msgs/point_cloud_conversion.h>
+#include <sensor_msgs/point_cloud_conversion.h>
 #include <tf/transform_listener.h>
 #include <tf/time_cache.h>
-//#include <pcl_ros/point_cloud.h>
-//#include <pcl/point_types.h>
-//#include <sensor_msgs/point_cloud_conversion.h>
+#include <pcl_ros/point_cloud.h>
+#include <pcl/point_types.h>
+#include <sensor_msgs/point_cloud_conversion.h>
 
-//#include <sensor_msgs/PointCloud.h>
-//#include <sensor_msgs/PointCloud2.h>
-#include <object_recognition_msgs/TableArray.h>
+#include <sensor_msgs/PointCloud.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <geometry_msgs/Pose.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <std_msgs/Header.h>
+
+#include <iostream>
+#include <vector>
 
 
+/*
 class frameTransformListener
 {
   ros::NodeHandle nh;
@@ -56,44 +59,81 @@ public:
       }
   }
 };
+*/
 
-/*
 namespace akira_recog_obj
 {
   class frameTransformListener
   {
   public:
     ros::NodeHandle nh;
-    ros::Puslisher pub_obj_marker;
-    ros::Subscriber sub_table_array;
+    ros::Publisher pub_obj;
+    ros::Subscriber sub_obj_array;
 
-    tf::TransformListener listener_camera_to_table;
+    tf::TransformListener listener;
     
     frameTransformListener ()
     {
-      pub_obj_marker = nh.advertise <visualization_msgs::MarkerArray> ( "akira/tabletop/clusters", 1 );
-      sub = nh.subscribe ( "/tabletop/clusters", 1, &frameTransformListener::callback, this );
+      pub_obj = nh.advertise <sensor_msgs::PointCloud2> ( "akira/tabletop/clusters", 1 );
+      sub_obj_array = nh.subscribe ( "/tabletop/clusters", 1, &frameTransformListener::callback, this );
     }
 
     ~frameTransformListener () { }
 
     void callback ( const visualization_msgs::MarkerArray::Ptr& input_data )
     {
-      geometry_msgs::PoseStamped::Ptr input_pose ( new geometry_msgs::PoseStamped );
-      geometry_msgs::PoseStamped::Ptr temp_pose1 ( new geometry_msgs::PoseStamped );
-      geometry_msgs::PoseStamped::Ptr temp_pose2 ( new geometry_msgs::PoseStamped );
+      ros::Time now = ros::Time::now ();
+      pcl::PointCloud<pcl::PointXYZ>::Ptr input_obj_data ( new pcl::PointCloud<pcl::PointXYZ> () );
+      std::vector<geometry_msgs::Point> temp;
+      std_msgs::Header input_data_header;
+      for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
+	{
+	  input_data_header = it->header;
+	  for ( auto its = std::begin ( it->points ) ; its != std::end ( it->points ) ; ++its )
+	    {
+	      geometry_msgs::Point temp_point;
+	      temp_point.x = its->x;
+	      temp_point.y = its->y;
+	      temp_point.z = its->z;
+	      temp.push_back ( temp_point );
+	    }
+	}
+      for ( auto it = temp.begin () ; it != temp.end () ; ++it )
+	input_obj_data->push_back ( pcl::PointXYZ ( it->x, it->z, it->z ) );
+      
+      sensor_msgs::PointCloud2::Ptr temp_obj_pointcloud2 ( new sensor_msgs::PointCloud2 );
+      pcl::toROSMsg ( *input_obj_data, *temp_obj_pointcloud2 );
+      sensor_msgs::PointCloud::Ptr temp_obj_pointcloud ( new sensor_msgs::PointCloud );
+      sensor_msgs::convertPointCloud2ToPointCloud ( *temp_obj_pointcloud2, *temp_obj_pointcloud );
+      temp_obj_pointcloud->header = input_data_header;
+      sensor_msgs::PointCloud2::Ptr transformed_clouds ( new sensor_msgs::PointCloud2 );
+
       try
 	{
-	  listener_camera_to_table.waitForTransform ( "camera_rgb_optical_frame", "camera_link", now, ros::Duration ( 3.0 ) );
-	  listener_camera_to_table.transformPose
+	  sensor_msgs::PointCloud::Ptr temp_transformed_pointcloud_num1 ( new sensor_msgs::PointCloud );
+	  sensor_msgs::PointCloud::Ptr temp_transformed_pointcloud_num2 ( new sensor_msgs::PointCloud );
+	  listener.waitForTransform ( temp_obj_pointcloud->header.frame_id, "camera_link", now, ros::Duration ( 3.0 ) );
+	  listener.transformPointCloud ( "camera_link", now, *temp_obj_pointcloud, temp_obj_pointcloud->header.frame_id, *temp_transformed_pointcloud_num1 );
+	  listener.waitForTransform ( "camera_link", "base_frame", now, ros::Duration ( 3.0 ) );
+	  listener.transformPointCloud ( "base_frame", now, *temp_transformed_pointcloud_num1, "camera_link", *temp_transformed_pointcloud_num2 );
+	  sensor_msgs::convertPointCloudToPointCloud2 ( *temp_transformed_pointcloud_num2, *transformed_clouds );
+	  pub_obj.publish ( *transformed_clouds );
+	}
+      catch ( tf::TransformException& ex )
+	{
+	  ROS_ERROR ( "%s", ex.what () );
+	  ros::Duration ( 1.0 ).sleep ();
+	}
+    }
+  };
+}
       
-      
-*/
+
 
 int main ( int argc, char** argv )
 {
   ros::init ( argc, argv, "akira_tf_listener" );
-  frameTransformListener tl;
+  akira_recog_obj::frameTransformListener tl;
   ros::Duration ( 10.0 ).sleep ();
 
   ros::spin ();

@@ -10,12 +10,9 @@ int main ( int argc, char** argv )
   ros::NodeHandle nh;
 
   //tf::TransformBroadcaster br_base_frame_to_base_link;
-  //tf::TransformBroadcaster br_base_link_to_camera_link;
+  tf::TransformBroadcaster br_base_link_to_camera_link;
   //tf::Transform transform_base_frame_to_base_link;
-  //tf::Transform transform_base_link_to_camera_link;
-
-  tf::TransformBroadcaster br_camera_link_to_table;
-  tf::Transform tf_camera_link_to_table;
+  tf::Transform tf_base_link_to_camera_link;
   
   ros::Rate rate ( 5.0 );
   while ( nh.ok () )
@@ -34,10 +31,9 @@ int main ( int argc, char** argv )
 	}
       else
 	{
-	  geometry_msgs::Pose table_pose = table_array->tables[ 0 ].pose;
-	  tf_camera_link_to_table.setRotation ( tf::Quaternion ( table_pose.quaternion.x, table_pose.quaternion.y, table_pose.quaternion.z ) );
-	  tf_camera_link_to_table.setOrigin ( tf::Vector3 ( table_pose.position.x, table_pose.position.y, table_pose.position.z ) );
-	  br_camera_link_to_table.sendTransform ( tf::StampedTransform ( tf_camera_link_to_table, ros::Time::now (), "camera_link", "table" ) );
+	  tf_base_link_to_camera_link.setRotation ( tf::createQuaternionFromRPY ( 0, ( 3.14 / 180 ) * 50, 0 ) );
+	  tf_base_link_to_camera_link.setOrigin ( tf::Vector3 ( 0, 0, 0.1 ) );
+	  br_base_link_to_camera_link.sendTransform ( tf::StampedTransform ( tf_base_link_to_camera_link, ros::Time::now (), "base_link", "camera_link" ) );
 
 	}
       rate.sleep ();
