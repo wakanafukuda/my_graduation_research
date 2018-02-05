@@ -85,6 +85,7 @@ namespace akira_recog_obj
       ros::Time now = ros::Time::now ();
       pcl::PointCloud<pcl::PointXYZ>::Ptr input_obj_data ( new pcl::PointCloud<pcl::PointXYZ> () );
       std::vector<geometry_msgs::Point> temp;
+      /*
       for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
 	{
 	  for ( auto its = std::begin ( it->points ) ; its != std::end ( it->points ) ; ++its )
@@ -96,6 +97,16 @@ namespace akira_recog_obj
 	      temp.push_back ( temp_point );
 	    }
 	}
+      */
+      for ( auto it = std::begin ( input_data->markers[ 0 ].points ) ; it != std::end ( input_data->markers[ 0 ].points ) ; ++it )
+	{
+	  geometry_msgs::Point temp_point;
+	  temp_point.x = it->x;
+	  temp_point.y = it->y;
+	  temp_point.z = it->z;
+	  temp.push_back ( temp_point );
+	}
+      
       for ( auto it = temp.begin () ; it != temp.end () ; ++it )
 	input_obj_data->push_back ( pcl::PointXYZ ( it->x, it->y, it->z ) );
       
@@ -109,7 +120,6 @@ namespace akira_recog_obj
 
       try
 	{
-	  
 	  sensor_msgs::PointCloud::Ptr temp_transformed_pointcloud_num1 ( new sensor_msgs::PointCloud );
 	  sensor_msgs::PointCloud::Ptr temp_transformed_pointcloud_num2 ( new sensor_msgs::PointCloud );
 	  listener.waitForTransform ( "camera_rgb_optical_frame", "camera_link", now, ros::Duration ( 3.0 ) );
