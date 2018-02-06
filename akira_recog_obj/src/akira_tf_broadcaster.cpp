@@ -31,7 +31,7 @@ int main ( int argc, char** argv )
 	}
       else
 	{
-	  tf_base_link_to_camera_link.setRotation ( tf::createQuaternionFromRPY ( 0, ( 3.14 / 180 ) * 45, 0 ) );
+	  tf_base_link_to_camera_link.setRotation ( tf::createQuaternionFromRPY ( 0, ( 3.14 / 180 ) * 30, 0 ) );
 	  tf_base_link_to_camera_link.setOrigin ( tf::Vector3 ( 0, 0, 0.1 ) );
 	  br_base_link_to_camera_link.sendTransform ( tf::StampedTransform ( tf_base_link_to_camera_link, ros::Time::now (), "base_frame", "camera_link" ) );
 

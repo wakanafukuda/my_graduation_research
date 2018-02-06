@@ -40,6 +40,7 @@
 //*** for ros::topic class ***
 
 #include <pcl/filters/passthrough.h>
+#include <pcl/filters/voxel_grid.h>
 
 namespace akira_recog_obj
 {
@@ -280,9 +281,10 @@ namespace akira_recog_obj
     {
       pcl::PointCloud<pcl::PointXYZ>::Ptr obj_pointcloud ( new pcl::PointCloud<pcl::PointXYZ> );
       pcl::PointCloud<pcl::PointXYZ>::Ptr obj_passthroughed_pointcloud ( new pcl::PointCloud<pcl::PointXYZ> );
+      pcl::PointCloud<pcl::PointXYZ>::Ptr obj_voxelgrid_pointcloud ( new pcl::PointCloud<pcl::PointXYZ> );
       pcl::fromROSMsg ( *input_data, *obj_pointcloud );
       passthrough_filter ( obj_pointcloud, "z", 0.4, -0.4, obj_passthroughed_pointcloud );
-      
+      voxel_grid ( obj_passthroughed_pointcloud, obj_voxelgrid_pointcloud );
       for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = obj_passthroughed_pointcloud->begin () ; it != obj_passthroughed_pointcloud->end () ; ++it )
 	{
 	  if ( it->x > obj_data.x_max )
@@ -339,7 +341,22 @@ namespace akira_recog_obj
       pass.setFilterLimits ( min, max );
       pass.filter ( *cut_clouds );
     }
-    
+
+    void voxel_grid ( pcl::PointCloud<pcl::PointXYZ>::Ptr& no_voxeled_clouds, pcl::PointCloud<pcl::PointXYZ>::Ptr& voxeled_clouds )
+    {
+      sensor_msgs::PointCloud2::Ptr converted1_no_voxeled_clouds ( new sensor_msgs::PointCloud2 );
+      pcl::toROSMsg ( *no_voxeled_clouds, *converted1_no_voxeled_clouds );
+      pcl::PCLPointCloud2::Ptr converted2_no_voxeled_clouds ( new pcl::PCLPointCloud2 );
+      pcl::PCLPointCloud2ConstPtr converted2_no_voxeled_cloudsPtr ( converted2_no_voxeled_clouds );
+      pcl::PCLPointCloud2 raw_voxeled_clouds;
+      pcl_conversions::toPCL( *converted1_no_voxeled_clouds, *converted2_no_voxeled_clouds );
+      pcl::VoxelGrid<pcl::PCLPointCloud2> vgf;
+      vgf.setInputCloud ( converted2_no_voxeled_cloudsPtr );
+      vgf.setLeafSize ( 0.005, 0.005, 0.005 );
+      vgf.filter ( raw_voxeled_clouds );
+      pcl::fromPCLPointCloud2 ( raw_voxeled_clouds, *voxeled_clouds );
+    }
+
   };
 }
 
