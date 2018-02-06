@@ -39,6 +39,8 @@
 #include <ros/topic.h>
 //*** for ros::topic class ***
 
+#include <pcl/filters/passthrough.h>
+
 namespace akira_recog_obj
 {
   class object_data_set
@@ -194,7 +196,7 @@ namespace akira_recog_obj
 	}
       else
 	{     
-	  pcl::PointCloud<pcl::PointXYZ>::Ptr obj_sorted_data ( new pcl::PointCloud<pcl::PointXYZ> () );
+	  pcl::PointCloud<pcl::PointXYZ>::Ptr obj_input_data ( new pcl::PointCloud<pcl::PointXYZ> () );
 	  for ( auto it = std::begin ( input_data->markers ) ; it != std::end ( input_data->markers ) ; ++it )
 	    {
 	      for ( auto its = std::begin ( it->points ) ; its != std::end ( it->points ) ; ++its )
@@ -208,7 +210,7 @@ namespace akira_recog_obj
 	    }
 	  for ( auto its = temp.begin () ; its != temp.end () ; ++its )
 	    {
-	      obj_sorted_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
+	      obj_input_data->push_back ( pcl::PointXYZ ( its->x, its->y, its->z ) );
 	    }
 
 	  //object_data_set obj_data;
@@ -221,7 +223,7 @@ namespace akira_recog_obj
 	  Eigen::Affine3f transform = Eigen::Affine3f::Identity ();
 	  transform.rotate ( Eigen::AngleAxisf ( theta_y, Eigen::Vector3f::UnitY () ) );
 	  transform.rotate ( Eigen::AngleAxisf ( theta_z, Eigen::Vector3f::UnitZ() ) );
-	  pcl::transformPointCloud ( *obj_sorted_data, *transformed_data, transform );
+	  pcl::transformPointCloud ( *obj_input_data, *transformed_data, transform );
 
 	  for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = transformed_data->begin () ; it != transformed_data->end () ; ++it )
 	    {
@@ -277,9 +279,11 @@ namespace akira_recog_obj
     void testObjCb ( const sensor_msgs::PointCloud2::ConstPtr& input_data )
     {
       pcl::PointCloud<pcl::PointXYZ>::Ptr obj_pointcloud ( new pcl::PointCloud<pcl::PointXYZ> );
+      pcl::PointCloud<pcl::PointXYZ>::Ptr obj_passthroughed_pointcloud ( new pcl::PointCloud<pcl::PointXYZ> );
       pcl::fromROSMsg ( *input_data, *obj_pointcloud );
-
-      for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = obj_pointcloud->begin () ; it != obj_pointcloud->end () ; ++it )
+      passthrough_filter ( obj_pointcloud, "z", 0.4, -0.4, obj_passthroughed_pointcloud );
+      
+      for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = obj_passthroughed_pointcloud->begin () ; it != obj_passthroughed_pointcloud->end () ; ++it )
 	{
 	  if ( it->x > obj_data.x_max )
 	    obj_data.x_max = it->x;
@@ -290,9 +294,9 @@ namespace akira_recog_obj
 	    obj_data.z_max = it->z;
 	  else if ( it->z < obj_data.z_min )
 	    obj_data.z_min = it->z;
-	}
+	}// for end x_max/min and z_max/min
       
-      for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = obj_pointcloud->begin () ; it != obj_pointcloud->end () ; ++it )
+      for ( pcl::PointCloud<pcl::PointXYZ>::iterator it = obj_passthroughed_pointcloud->begin () ; it != obj_passthroughed_pointcloud->end () ; ++it )
 	{
 	  if ( it->z < ( obj_data.z_min + 0.02 ) )
 	    {
@@ -308,9 +312,9 @@ namespace akira_recog_obj
 	      else if ( it->y < obj_data.up_y_min )
 		obj_data.up_y_min = it->y;
 	    }
-	}
-      obj_data.size = obj_pointcloud->size ();
-      
+	}// for end bottom/up
+      obj_data.size = obj_passthroughed_pointcloud->size ();
+	  
       obj_data.calc_parameters ();
       std::cout << "bottom_diameter: " << obj_data.bottom_diameter << ", up_diameter: " << obj_data.up_diameter << std::endl;
       std::cout << "depth: " << obj_data.depth << ", height: " << obj_data.height << std::endl;
@@ -326,6 +330,15 @@ namespace akira_recog_obj
       obj_data.write_data ( dir_name, size_file );
       obj_data.init_data ();
     }//testObjCb end
+
+    void passthrough_filter ( pcl::PointCloud<pcl::PointXYZ>::Ptr& uncut_clouds, std::string axis, double max, double min, pcl::PointCloud<pcl::PointXYZ>::Ptr& cut_clouds )
+    {
+      pcl::PassThrough<pcl::PointXYZ> pass;
+      pass.setInputCloud ( uncut_clouds );
+      pass.setFilterFieldName ( axis );
+      pass.setFilterLimits ( min, max );
+      pass.filter ( *cut_clouds );
+    }
     
   };
 }
