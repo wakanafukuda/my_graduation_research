@@ -358,9 +358,9 @@ namespace akira_recog_obj
       if ( obj_data.name.length () > 0 )
 	std::cout << "name: " << obj_data.name << ", angle: " << obj_data.angle << std::endl;
 
-      double bottom_x_center = ( x_max + x_min ) / 2.0;
-      double bottom_y_center = ( obj_data.bottom_y_max + obj_data.bottom_y_min ) / 2.0;
-      double up_y_center = ( obj_data.up_y_max + obj_data.up_y_min ) / 2.0;
+      //double bottom_x_center = ( x_max + x_min ) / 2.0;
+      //double bottom_y_center = ( obj_data.bottom_y_max + obj_data.bottom_y_min ) / 2.0;
+      //double up_y_center = ( obj_data.up_y_max + obj_data.up_y_min ) / 2.0;
       
       obj_data.write_data ( dir_name, bottom_diameter_file );
       obj_data.write_data ( dir_name, up_diameter_file );
